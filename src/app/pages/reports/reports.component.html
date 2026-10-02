@@ -1,0 +1,119 @@
+<section class="animate-in">
+  <div class="mb-7 flex items-end justify-between">
+    <div>
+      <div
+        class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+      >
+        Insights
+      </div>
+      <h1 class="font-display text-[2.4rem]">Reports</h1>
+      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        Useful patterns, without the spreadsheet feeling.
+      </p>
+    </div>
+    <button
+      (click)="vm.exportReport()"
+      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-soft"
+    >
+      <i-lucide name="download" [size]="15"></i-lucide>Export
+    </button>
+  </div>
+  <div
+    class="mb-5 flex w-fit items-center gap-1 rounded-xl border border-border bg-card p-1 shadow-soft"
+  >
+    <button
+      *ngFor="let p of reportPeriods"
+      (click)="vm.reportPeriod = p"
+      class="rounded-lg px-3 py-2 text-xs font-semibold"
+      [ngClass]="
+        vm.reportPeriod === p
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-muted'
+      "
+    >
+      {{ p }}
+    </button>
+  </div>
+  <div class="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="font-display text-xl">{{ vm.reportPeriod }} spending</h2>
+          <p class="mt-1 text-xs text-muted-foreground">
+            A directional view of the last six months
+          </p>
+        </div>
+        <i-lucide
+          name="bar-chart-3"
+          class="text-primary"
+          [size]="19"
+        ></i-lucide>
+      </div>
+      <div class="mt-8 flex h-[220px] items-end gap-3">
+        <div
+          *ngFor="let item of vm.reportMonths(); let i = index"
+          class="group flex flex-1 flex-col items-center gap-2"
+        >
+          <div
+            class="w-full rounded-t-lg bg-primary/65 transition-all group-hover:bg-primary"
+            [style.height.%]="
+              vm.reportMonths().length
+                ? (item.amount / (vm.reportMax || 1)) * 100
+                : 0
+            "
+          ></div>
+          <span class="text-[10px] text-muted-foreground">{{
+            item.label
+          }}</span>
+        </div>
+      </div>
+    </section>
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <h2 class="font-display text-xl">Top category</h2>
+      <p class="mt-1 text-xs text-muted-foreground">
+        Where the most went this period
+      </p>
+      <div class="mt-8 flex items-center gap-5">
+        <div
+          class="relative grid size-32 place-items-center rounded-full"
+          style="
+            background: conic-gradient(
+              hsl(var(--primary)) 0 var(--top-category-percent),
+              hsl(var(--accent)) var(--top-category-percent) 100%
+            );
+          "
+        >
+          <div
+            class="grid size-20 place-items-center rounded-full bg-card font-display text-xl"
+          >
+            {{ vm.topCategories[0]?.percent || 0 }}%
+          </div>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div
+            *ngFor="let x of vm.topCategories"
+            class="flex items-center gap-2"
+          >
+            <span class="size-2 rounded-full bg-primary"></span
+            ><span class="text-muted-foreground">{{ x.category }}</span
+            ><strong class="ml-auto">{{ x.percent }}%</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <section
+    class="mt-5 rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+  >
+    <h2 class="font-display text-xl">A note from your numbers</h2>
+    <p class="mt-1 text-xs text-muted-foreground">The helpful bit, distilled</p>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground">
+      This report is calculated from the transactions, income and expense
+      records returned by your backend API.
+    </p>
+  </section>
+</section>

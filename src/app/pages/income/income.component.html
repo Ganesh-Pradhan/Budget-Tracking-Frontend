@@ -1,0 +1,74 @@
+<section class="animate-in">
+  <div class="mb-7 flex items-end justify-between">
+    <div>
+      <div
+        class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+      >
+        Plan / inflow
+      </div>
+      <h1 class="font-display text-[2.4rem]">Income</h1>
+      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        Track what is coming in and where it comes from.
+      </p>
+    </div>
+    <button
+      (click)="vm.openModal('income')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"
+    >
+      <i-lucide name="plus" [size]="16"></i-lucide>Add income
+    </button>
+  </div>
+  <div class="mb-5 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        This month
+      </div>
+      <div class="mt-2 font-display text-3xl">
+        {{ vm.money(vm.monthIncome) }}
+      </div>
+      <div class="mt-1 text-xs text-muted-foreground">
+        Across {{ vm.store().incomes.length }} income records
+      </div>
+    </div>
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        Salary
+      </div>
+      <div class="mt-2 font-display text-3xl">
+        {{ vm.money(vm.incomeBySource("Salary")) }}
+      </div>
+    </div>
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        Freelance
+      </div>
+      <div class="mt-2 font-display text-3xl">
+        {{ vm.money(vm.incomeBySource("Freelance")) }}
+      </div>
+    </div>
+  </div>
+  <section
+    class="overflow-hidden rounded-2xl border border-card-border bg-card shadow-soft"
+  >
+    <div class="border-b border-border px-5 py-4">
+      <h2 class="font-display text-xl">Income history</h2>
+    </div>
+    <div
+      *ngFor="let item of vm.store().incomes"
+      class="flex items-center gap-3 border-b border-border/70 px-5 py-4"
+    >
+      <div
+        class="grid size-9 place-items-center rounded-xl bg-primary/12 text-primary"
+      >
+        <i-lucide name="arrow-up-right" [size]="16"></i-lucide>
+      </div>
+      <div class="flex-1">
+        <div class="text-sm font-medium">{{ item.description }}</div>
+        <div class="text-[11px] text-muted-foreground">
+          {{ item.source }} · {{ vm.dateLabel(item.incomeDate) }}
+        </div>
+      </div>
+      <div class="font-semibold text-primary">+{{ vm.money(item.amount) }}</div>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,159 @@
+<section class="animate-in">
+  <div class="mb-7">
+    <div
+      class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+    >
+      Workspace
+    </div>
+    <h1 class="font-display text-[2.4rem]">Settings</h1>
+    <p class="mt-2 text-sm leading-6 text-muted-foreground">
+      Make this space feel like yours.
+    </p>
+  </div>
+  <div class="grid max-w-4xl gap-5">
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <div class="mb-6 flex items-center gap-3">
+        <div class="grid size-10 place-items-center rounded-xl bg-accent/20">
+          <i-lucide name="sparkles" [size]="18"></i-lucide>
+        </div>
+        <div>
+          <h2 class="font-display text-xl">Your profile</h2>
+          <p class="text-xs text-muted-foreground">
+            A little context for your workspace
+          </p>
+        </div>
+      </div>
+      <label class="block max-w-md text-xs font-semibold"
+        >Display name<input
+          [ngModel]="vm.settings().name"
+          (ngModelChange)="vm.updateSetting({ name: $event })"
+          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-2"
+      /></label>
+    </section>
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <div class="mb-6">
+        <h2 class="font-display text-xl">Preferences</h2>
+        <p class="mt-1 text-xs text-muted-foreground">
+          The details that shape your view
+        </p>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <label class="text-xs font-semibold"
+          >Currency<select
+            [ngModel]="vm.settings().currency"
+            (ngModelChange)="vm.updateSetting({ currency: $event })"
+            class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+          >
+            <option value="USD">USD · US Dollar</option>
+            <option value="EUR">EUR · Euro</option>
+            <option value="GBP">GBP · Pound Sterling</option>
+          </select></label
+        >
+        <div class="text-xs font-semibold">
+          Theme
+          <div class="mt-2 flex rounded-xl border border-input p-1">
+            <button
+              (click)="vm.updateSetting({ theme: 'light' })"
+              class="flex-1 rounded-lg px-3 py-2 text-xs"
+              [class.bg-secondary]="vm.settings().theme === 'light'"
+            >
+              Light</button
+            ><button
+              (click)="vm.updateSetting({ theme: 'dark' })"
+              class="flex-1 rounded-lg px-3 py-2 text-xs"
+              [class.bg-secondary]="vm.settings().theme === 'dark'"
+            >
+              Dark
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-6 flex items-center justify-between border-t border-border pt-5"
+      >
+        <div>
+          <div class="text-sm font-medium">Weekly check-in</div>
+          <p class="mt-1 text-xs text-muted-foreground">
+            A gentle nudge to review your money
+          </p>
+        </div>
+        <button
+          (click)="
+            vm.updateSetting({ notifications: !vm.settings().notifications })
+          "
+          class="relative h-6 w-11 rounded-full"
+          [class.bg-primary]="vm.settings().notifications"
+          [class.bg-muted]="!vm.settings().notifications"
+        >
+          <span
+            class="absolute top-1 size-4 rounded-full bg-card transition-transform"
+            [class.left-6]="vm.settings().notifications"
+            [class.left-1]="!vm.settings().notifications"
+          ></span>
+        </button>
+      </div>
+    </section>
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-xl">API connection</h2>
+          <p class="mt-1 text-xs text-muted-foreground">
+            The frontend uses the backend API for application data
+          </p>
+        </div>
+        <span
+          class="rounded-full px-2.5 py-1 text-[10px] font-semibold"
+          [ngClass]="
+            vm.apiStatus === 'success'
+              ? 'bg-primary/10 text-primary'
+              : vm.apiStatus === 'error'
+                ? 'bg-destructive/10 text-destructive'
+                : 'bg-secondary text-muted-foreground'
+          "
+          >{{
+            vm.apiStatus === "success"
+              ? "Connected"
+              : vm.apiStatus === "error"
+                ? "Unavailable"
+                : "Not
+          checked"
+          }}</span
+        >
+      </div>
+      <label class="block text-xs font-semibold"
+        >API base URL<input
+          [ngModel]="vm.settings().apiBaseUrl"
+          (ngModelChange)="vm.updateSetting({ apiBaseUrl: $event })"
+          placeholder="http://localhost:5264"
+          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-2"
+      /></label>
+      <div class="mt-4 flex items-center justify-between gap-3">
+        <p class="text-[11px] leading-5 text-muted-foreground">
+          The application loads and saves financial data through this API.
+        </p>
+        <button
+          (click)="vm.testConnection()"
+          [disabled]="vm.apiChecking"
+          class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50"
+        >
+          <i-lucide
+            [name]="vm.apiChecking ? 'refresh-cw' : 'zap'"
+            [size]="14"
+          ></i-lucide
+          >{{
+            vm.apiChecking
+              ? "Checking…"
+              : "Test
+          connection"
+          }}
+        </button>
+      </div>
+    </section>
+  </div>
+</section>

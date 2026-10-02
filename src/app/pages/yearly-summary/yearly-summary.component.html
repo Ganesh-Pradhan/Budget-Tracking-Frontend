@@ -1,0 +1,49 @@
+<section class="animate-in">
+  <div class="mb-7">
+    <div
+      class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+    >
+      Organize / {{ vm.currentYear }}
+    </div>
+    <h1 class="font-display text-[2.4rem]">Yearly summary</h1>
+    <p class="mt-2 text-sm leading-6 text-muted-foreground">
+      A quiet overview of your year so far.
+    </p>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-3">
+    <div
+      *ngFor="let c of summaryStats"
+      class="rounded-2xl border border-card-border bg-card p-6 shadow-soft"
+    >
+      <i-lucide [name]="c.i" [size]="19" class="text-primary"></i-lucide>
+      <div
+        class="mt-6 text-[11px] uppercase tracking-[.13em] text-muted-foreground"
+      >
+        {{ c.l }}
+      </div>
+      <div class="mt-2 font-display text-3xl">{{ c.v }}</div>
+    </div>
+  </div>
+  <section
+    class="mt-5 rounded-2xl border border-card-border bg-card p-6 shadow-soft"
+  >
+    <h2 class="font-display text-xl">Monthly movement</h2>
+    <div class="mt-8 grid h-[210px] grid-cols-6 items-end gap-3">
+      <div
+        *ngFor="let item of vm.reportMonths()"
+        class="rounded-t-lg bg-primary/70"
+        [style.height.%]="
+          vm.reportMonths().length
+            ? (item.amount / (vm.reportMax || 1)) * 100
+            : 0
+        "
+      >
+        <div
+          class="mt-2 translate-y-full text-center text-[10px] text-muted-foreground"
+        >
+          {{ item.label }}
+        </div>
+      </div>
+    </div>
+  </section>
+</section>

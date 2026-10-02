@@ -1,0 +1,62 @@
+<section class="animate-in">
+  <div class="mb-7 flex items-end justify-between">
+    <div>
+      <div
+        class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+      >
+        Plan / future
+      </div>
+      <h1 class="font-display text-[2.4rem]">Savings goals</h1>
+      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        Small progress, made visible.
+      </p>
+    </div>
+    <button
+      (click)="vm.openModal('goal')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"
+    >
+      <i-lucide name="plus" [size]="16"></i-lucide>Create goal
+    </button>
+  </div>
+  <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <section
+      *ngFor="let g of vm.store().goals"
+      class="rounded-2xl border border-card-border bg-card p-6 shadow-soft"
+    >
+      <div class="flex items-start justify-between">
+        <div
+          class="grid size-10 place-items-center rounded-xl bg-secondary text-primary"
+        >
+          <i-lucide name="target" [size]="19"></i-lucide>
+        </div>
+        <button
+          (click)="vm.deleteItem('goals', g.goalId)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+        >
+          <i-lucide name="trash-2" [size]="14"></i-lucide>
+        </button>
+      </div>
+      <h2 class="mt-7 font-display text-xl">{{ g.goalName }}</h2>
+      <div class="mt-1 text-xs text-muted-foreground">
+        Target {{ vm.dateLabel(g.targetDate) }}
+      </div>
+      <div class="mt-7 flex justify-between text-xs">
+        <span>{{ vm.money(g.savedAmount) }} saved</span
+        ><strong
+          >{{ Math.round((g.savedAmount / g.targetAmount) * 100) }}%</strong
+        >
+      </div>
+      <div class="mt-2 h-2 rounded-full bg-muted">
+        <div
+          class="h-full rounded-full bg-primary"
+          [style.width.%]="
+            Math.min(100, (g.savedAmount / g.targetAmount) * 100)
+          "
+        ></div>
+      </div>
+      <div class="mt-2 text-right text-[11px] text-muted-foreground">
+        {{ vm.money(g.targetAmount) }} goal
+      </div>
+    </section>
+  </div>
+</section>

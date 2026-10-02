@@ -1,0 +1,50 @@
+<section class="animate-in">
+  <div class="mb-7 flex items-end justify-between">
+    <div>
+      <div
+        class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
+      >
+        Organize / money
+      </div>
+      <h1 class="font-display text-[2.4rem]">Accounts</h1>
+      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        Know where your money is sitting.
+      </p>
+    </div>
+    <button
+      (click)="vm.openModal('account')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"
+    >
+      <i-lucide name="plus" [size]="16"></i-lucide>Add account
+    </button>
+  </div>
+  <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <section
+      *ngFor="let a of vm.store().accounts"
+      class="rounded-2xl border border-card-border bg-card p-6 shadow-soft"
+    >
+      <div class="flex items-start justify-between">
+        <div class="grid size-10 place-items-center rounded-xl bg-secondary">
+          <i-lucide name="landmark" [size]="19"></i-lucide>
+        </div>
+        <button
+          (click)="vm.deleteItem('accounts', a.accountId)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+        >
+          <i-lucide name="trash-2" [size]="14"></i-lucide>
+        </button>
+      </div>
+      <div class="mt-7 text-xs text-muted-foreground">{{ a.accountType }}</div>
+      <h2 class="mt-1 font-display text-xl">{{ a.accountName }}</h2>
+      <div class="mt-1 text-xs text-muted-foreground">
+        {{ a.bankName }} · {{ a.accountNumber }}
+      </div>
+      <div
+        class="mt-7 font-display text-3xl"
+        [class.text-destructive]="a.balance < 0"
+      >
+        {{ vm.money(a.balance) }}
+      </div>
+    </section>
+  </div>
+</section>
