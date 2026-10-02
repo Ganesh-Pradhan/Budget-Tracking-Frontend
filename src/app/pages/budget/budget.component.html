@@ -31,7 +31,7 @@
       </div>
       <div class="mt-2 flex justify-between text-xs opacity-75">
         <span>Remaining</span
-        ><span>{{ vm.money(Math.max(0, 2400 - vm.monthExpenses)) }}</span>
+        ><span>{{ vm.money(vm.budgetRemaining) }}</span>
       </div>
     </section>
     <section
