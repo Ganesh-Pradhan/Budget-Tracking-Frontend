@@ -356,6 +356,12 @@ export class BudgetService {
         item?.targetDate ||
         item?.nextOccurrenceDate ||
         new Date().toISOString().slice(0, 10),
+      targetDate:
+        type === "goal"
+          ? item?.targetDate || ""
+          : item?.nextOccurrenceDate ||
+            new Date().toISOString().slice(0, 10),
+      savedAmount: type === "goal" ? item?.savedAmount ?? 0 : "",
       category: item?.category || this.categories[0] || "",
       type: item?.transactionType || "Expense",
       extra:
@@ -525,8 +531,8 @@ export class BudgetService {
           userId,
           goalName: f.description,
           targetAmount: amount,
-          savedAmount: this.editing?.savedAmount || 0,
-          targetDate: f.date || null,
+          savedAmount: Number(f.savedAmount) || (this.editing?.savedAmount || 0),
+          targetDate: f.targetDate || null,
         };
         if (this.editing)
           await this.api.put(
@@ -535,8 +541,8 @@ export class BudgetService {
             {
               goalName: f.description,
               targetAmount: amount,
-              savedAmount: this.editing.savedAmount || 0,
-              targetDate: f.date || null,
+              savedAmount: Number(f.savedAmount) || (this.editing.savedAmount || 0),
+              targetDate: f.targetDate || null,
             },
           );
         else await this.api.post(baseUrl, "/api/savingsgoals", payload);

@@ -582,18 +582,97 @@
     </select>
   </label>
 
-  <!-- DATE -->
+  <!-- DATE (for transaction, income, expense, bill) -->
   <label
-    *ngIf="vm.modal() === 'income'"
+    *ngIf="
+      vm.modal() === 'transaction' ||
+      vm.modal() === 'income' ||
+      vm.modal() === 'expense' ||
+      vm.modal() === 'bill'
+    "
     class="block text-xs font-semibold"
   >
     Date
-
     <input
       required
       type="date"
+      id="modal-date-input"
       [(ngModel)]="vm.form.date"
-      name="income-date"
+      [name]="
+        vm.modal() === 'income'
+          ? 'income-date'
+          : vm.modal() === 'expense'
+          ? 'expense-date'
+          : vm.modal() === 'bill'
+          ? 'bill-date'
+          : 'transaction-date'
+      "
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+      (click)="$event.target.showPicker?.()"
+    />
+  </label>
+
+  <!-- TARGET DATE (GOAL) -->
+  <label
+    *ngIf="vm.modal() === 'goal'"
+    class="block text-xs font-semibold"
+  >
+    Target Date
+    <input
+      type="date"
+      id="modal-target-date-input"
+      [(ngModel)]="vm.form.targetDate"
+      name="goal-target-date"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+      (click)="$event.target.showPicker?.()"
+    />
+  </label>
+
+  <!-- SAVED AMOUNT (GOAL) -->
+  <label
+    *ngIf="vm.modal() === 'goal'"
+    class="block text-xs font-semibold"
+  >
+    Saved Amount
+    <input
+      type="number"
+      min="0"
+      step="0.01"
+      [(ngModel)]="vm.form.savedAmount"
+      name="goal-saved-amount"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+    />
+  </label>
+
+  <!-- FREQUENCY (BILL) -->
+  <label
+    *ngIf="vm.modal() === 'bill'"
+    class="block text-xs font-semibold"
+  >
+    Frequency
+    <select
+      [(ngModel)]="vm.form.extra"
+      name="bill-frequency"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+    >
+      <option value="Weekly">Weekly</option>
+      <option value="BiWeekly">Bi-Weekly</option>
+      <option value="Monthly">Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Yearly">Yearly</option>
+    </select>
+  </label>
+
+  <!-- BANK NAME (ACCOUNT) -->
+  <label
+    *ngIf="vm.modal() === 'account'"
+    class="block text-xs font-semibold"
+  >
+    Bank name
+    <input
+      type="text"
+      [(ngModel)]="vm.form.extra"
+      name="account-bank"
       class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
     />
   </label>
