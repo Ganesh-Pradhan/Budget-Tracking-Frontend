@@ -263,16 +263,16 @@
         <div
           class="grid size-9 shrink-0 place-items-center rounded-xl"
           [ngClass]="
-            item.transactionType === 'Income'
-              ? 'bg-primary/12 text-primary'
-              : 'bg-accent/15 text-accent-foreground'
+            item.transactionType === 'Expense'
+              ? 'bg-accent/15 text-accent-foreground'
+              : 'bg-blue/15 text-blue'
           "
         >
           <i-lucide
             [name]="
-              item.transactionType === 'Income'
-                ? 'arrow-up-right'
-                : 'arrow-down-left'
+              item.transactionType === 'Expense'
+                ? 'arrow-down-left'
+                : 'heart'
             "
             [size]="16"
           ></i-lucide>
@@ -285,9 +285,10 @@
         </div>
         <div
           class="text-sm font-semibold"
-          [class.text-primary]="item.transactionType === 'Income'"
+          [class.text-accent-foreground]="item.transactionType === 'Expense'"
+          [class.text-blue]="item.transactionType === 'Need'"
         >
-          {{ item.transactionType === "Income" ? "+" : "-"
+          {{ item.transactionType === "Expense" ? "-" : "+"
           }}{{ vm.money(item.amount) }}
         </div>
         <button

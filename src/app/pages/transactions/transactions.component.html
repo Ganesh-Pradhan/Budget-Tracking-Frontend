@@ -40,8 +40,8 @@
       class="rounded-xl border border-input bg-background px-3 py-2.5 text-sm"
     >
       <option>All</option>
-      <option>Income</option>
-      <option>Expense</option></select
+      <option>Expense</option>
+      <option>Need</option></select
     ><select
       [(ngModel)]="vm.filterMode"
       class="rounded-xl border border-input bg-background px-3 py-2.5 text-sm"
@@ -59,24 +59,24 @@
       <span>Description</span><span>Category</span><span>Date</span
       ><span>Amount</span><span></span>
     </div>
-    <div
-      *ngFor="let item of vm.filteredTransactions"
-      class="grid items-center gap-3 border-b border-border/70 px-5 py-4 sm:grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px]"
-    >
+<div
+        *ngFor="let item of vm.filteredTransactions"
+        class="grid items-center gap-3 border-b border-border/70 px-5 py-4 sm:grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px]"
+      >
       <div class="flex items-center gap-3">
         <div
           class="grid size-9 place-items-center rounded-xl"
           [ngClass]="
-            item.transactionType === 'Income'
-              ? 'bg-primary/12 text-primary'
-              : 'bg-accent/15'
+            item.transactionType === 'Expense'
+              ? 'bg-accent/15 text-accent-foreground'
+              : 'bg-blue/15 text-blue'
           "
         >
           <i-lucide
             [name]="
-              item.transactionType === 'Income'
-                ? 'arrow-up-right'
-                : 'arrow-down-left'
+              item.transactionType === 'Expense'
+                ? 'arrow-down-left'
+                : 'heart'
             "
             [size]="16"
           ></i-lucide>
@@ -94,8 +94,9 @@
       }}</span
       ><span
         class="text-sm font-semibold"
-        [class.text-primary]="item.transactionType === 'Income'"
-        >{{ item.transactionType === "Income" ? "+" : "-"
+        [class.text-accent-foreground]="item.transactionType === 'Expense'"
+        [class.text-blue]="item.transactionType === 'Need'"
+        >{{ item.transactionType === "Expense" ? "-" : "+"
         }}{{ vm.money(item.amount) }}</span
       ><button
         (click)="vm.deleteTransaction(item)"
