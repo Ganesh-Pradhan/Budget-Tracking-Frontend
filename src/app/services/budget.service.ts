@@ -219,6 +219,19 @@ export class BudgetService {
     return daily.map((v) => Math.max(3, Math.round((v / max) * 100)));
   }
 
+  get monthChartLabels(): string[] {
+    const [year, month] = this.month().split("-").map(Number);
+    const days = new Date(year, month, 0).getDate();
+    if (days <= 1) return [`1 ${this.monthLabel(this.month()).split(" ")[0]}`];
+    const mid = Math.ceil(days / 2);
+    const fmt = new Intl.DateTimeFormat("en-US", { day: "numeric", month: "short" });
+    return [
+      fmt.format(new Date(year, month - 1, 1)),
+      fmt.format(new Date(year, month - 1, mid)),
+      fmt.format(new Date(year, month - 1, days)),
+    ];
+  }
+
   get reportMax() {
     return Math.max(...this.reportMonths().map((x) => x.amount), 1);
   }
