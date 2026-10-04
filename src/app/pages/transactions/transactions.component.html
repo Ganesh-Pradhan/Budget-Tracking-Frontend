@@ -39,7 +39,23 @@
   <section class="rounded-2xl border border-card-border bg-card shadow-soft">
     <div
       class="hidden grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
-      <span>Description</span><span>Category</span><span>Date</span><span class="text-right">Amount</span><span></span>
+      <span>Description</span><span>Category</span>
+      <button (click)="vm.toggleSort('date')"
+        class="flex items-center gap-1 justify-center hover:text-foreground transition-colors" title="Sort by date">
+        <span>Date</span>
+        <i-lucide
+          [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'"
+          [size]="12" class="text-muted-foreground/50"></i-lucide>
+      </button>
+      <button (click)="vm.toggleSort('amount')"
+        class="flex items-center gap-1 justify-center text-right hover:text-foreground transition-colors"
+        title="Sort by amount">
+        <span class="text-right">Amount</span>
+        <i-lucide
+          [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'"
+          [size]="12" class="text-muted-foreground/50"></i-lucide>
+      </button>
+      <span></span>
     </div>
     <div *ngFor="let item of vm.filteredTransactions; let i = index"
       class="grid items-center gap-3 border-b border-border/50 px-5 py-4 hover:bg-muted/30 transition-colors sm:grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px]">
@@ -63,11 +79,10 @@
         </div>
       </div>
       <span class="text-xs text-muted-foreground">{{ item.category }}</span><span
-        class="text-xs text-muted-foreground">{{
-        vm.dateLabel(item.transactionDate)
+        class="text-xs text-muted-foreground">{{ vm.dateLabel(item.transactionDate)
         }}</span><span class="text-sm font-semibold text-right"
-        [class.text-destructive]="item.transactionType === 'Expense'"
-        [class.text-blue]="item.transactionType === 'Need'">{{ item.transactionType === "Expense" ? "-" : "+"
+        [class.amount-expense]="item.transactionType === 'Expense'"
+        [class.amount-income]="item.transactionType === 'Need'">{{ item.transactionType === "Expense" ? "-" : "+"
         }}{{ vm.money(item.amount) }}</span><button (click)="vm.deleteTransaction(item)"
         class="rounded-lg p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
         <i-lucide name="trash-2" [size]="14"></i-lucide>

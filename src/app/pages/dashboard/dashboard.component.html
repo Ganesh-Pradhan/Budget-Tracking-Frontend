@@ -74,7 +74,11 @@
       <div class="mt-7 text-[11px] uppercase tracking-[.13em] opacity-65">
         {{ c.l }}
       </div>
-      <div class="mt-1 font-display text-[2rem] tracking-tight">{{ c.v }}</div>
+      <div class="mt-1 font-display text-[2rem] tracking-tight">
+        <span [class.amount-income]="c.tone === 'default' || c.tone === 'green'"
+              [class.amount-expense]="c.tone === 'peach'"
+              [class.amount-neutral]="c.tone === 'navy'">{{ c.v }}</span>
+      </div>
       <div class="mt-1 text-xs opacity-65">{{ c.n }}</div>
     </div>
   </div>
@@ -126,7 +130,7 @@
           <div>
             <div class="flex justify-between text-xs">
               <span class="text-muted-foreground">Spent</span
-              ><span class="font-semibold">{{
+              ><span class="font-semibold amount-expense">{{
                 vm.money(vm.monthExpenses)
               }}</span>
             </div>
@@ -140,7 +144,7 @@
           <div>
             <div class="flex justify-between text-xs">
               <span class="text-muted-foreground">Budget left</span
-              ><span class="font-semibold">{{
+              ><span class="font-semibold amount-income">{{
                 vm.money(vm.budgetRemaining)
               }}</span>
             </div>

@@ -41,7 +41,7 @@
         Target {{ vm.dateLabel(g.targetDate) }}
       </div>
       <div class="mt-7 flex justify-between text-xs">
-        <span>{{ vm.money(g.savedAmount) }} saved</span
+        <span class="amount-savings">{{ vm.money(g.savedAmount) }} saved</span
         ><strong
           >{{ Math.round((g.savedAmount / g.targetAmount) * 100) }}%</strong
         >
@@ -54,7 +54,7 @@
           "
         ></div>
       </div>
-      <div class="mt-2 text-right text-[11px] text-muted-foreground">
+      <div class="mt-2 text-right text-[11px] amount-savings">
         {{ vm.money(g.targetAmount) }} goal
       </div>
     </section>

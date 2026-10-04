@@ -41,7 +41,8 @@
       </div>
       <div
         class="mt-7 font-display text-3xl"
-        [class.text-destructive]="a.balance < 0"
+        [class.amount-expense]="a.balance < 0"
+        [class.amount-income]="a.balance >= 0"
       >
         {{ vm.money(a.balance) }}
       </div>

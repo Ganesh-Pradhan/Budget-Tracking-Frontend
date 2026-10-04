@@ -24,6 +24,8 @@ export class BudgetService {
   search = "";
   filterType = "All";
   filterMode = "All";
+  sortColumn = signal<"date" | "amount" | null>(null);
+  sortDirection = signal<"asc" | "desc">("asc");
   reportPeriod = "Monthly";
   apiChecking = false;
   apiStatus: "idle" | "success" | "error" = "idle";
@@ -248,10 +250,54 @@ export class BudgetService {
       .reduce((sum, item) => sum + item.amount, 0);
   }
 
+  get sortedIncomes() {
+    let result = [...this.store().incomes];
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (col) {
+      result = result.sort((a, b) => {
+        let aVal: any, bVal: any;
+        if (col === "date") {
+          aVal = new Date(a.incomeDate).getTime();
+          bVal = new Date(b.incomeDate).getTime();
+        } else if (col === "amount") {
+          aVal = a.amount;
+          bVal = b.amount;
+        }
+        if (aVal < bVal) return dir === "asc" ? -1 : 1;
+        if (aVal > bVal) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
+  }
+
   get monthExpenses() {
     return this.store()
       .expenses.filter((e) => e.expenseDate.startsWith(this.month()))
       .reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  get sortedExpenses() {
+    let result = [...this.store().expenses];
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (col) {
+      result = result.sort((a, b) => {
+        let aVal: any, bVal: any;
+        if (col === "date") {
+          aVal = new Date(a.expenseDate).getTime();
+          bVal = new Date(b.expenseDate).getTime();
+        } else if (col === "amount") {
+          aVal = a.amount;
+          bVal = b.amount;
+        }
+        if (aVal < bVal) return dir === "asc" ? -1 : 1;
+        if (aVal > bVal) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
   }
 
   get accountsTotal() {
@@ -270,6 +316,28 @@ export class BudgetService {
   }
   totalBills() {
     return this.store().bills.reduce((sum, b) => sum + b.amount, 0);
+  }
+
+  get sortedBills() {
+    let result = [...this.store().bills];
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (col) {
+      result = result.sort((a, b) => {
+        let aVal: any, bVal: any;
+        if (col === "date") {
+          aVal = new Date(a.nextOccurrenceDate).getTime();
+          bVal = new Date(b.nextOccurrenceDate).getTime();
+        } else if (col === "amount") {
+          aVal = a.amount;
+          bVal = b.amount;
+        }
+        if (aVal < bVal) return dir === "asc" ? -1 : 1;
+        if (aVal > bVal) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
   }
 
   get categoriesSpend() {
@@ -292,7 +360,7 @@ export class BudgetService {
   }
 
   get filteredTransactions() {
-    return this.store().transactions.filter(
+    let result = this.store().transactions.filter(
       (t) =>
         (!this.search ||
           t.description.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -300,6 +368,34 @@ export class BudgetService {
         (this.filterType === "All" || t.transactionType === this.filterType) &&
         (this.filterMode === "All" || t.paymentMode === this.filterMode),
     );
+
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (col) {
+      result = [...result].sort((a, b) => {
+        let aVal: any, bVal: any;
+        if (col === "date") {
+          aVal = new Date(a.transactionDate).getTime();
+          bVal = new Date(b.transactionDate).getTime();
+        } else if (col === "amount") {
+          aVal = a.amount;
+          bVal = b.amount;
+        }
+        if (aVal < bVal) return dir === "asc" ? -1 : 1;
+        if (aVal > bVal) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
+  }
+
+  toggleSort(column: "date" | "amount") {
+    if (this.sortColumn() === column) {
+      this.sortDirection.update((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set("asc");
+    }
   }
 
   get accounts() {

@@ -67,10 +67,18 @@
     <div class="border-b border-border px-5 py-4">
       <h2 class="font-display text-xl">Expense history</h2>
     </div>
-    <div
-      *ngFor="let item of vm.store().expenses"
-      class="flex items-center gap-3 border-b border-border/70 px-5 py-4"
-    >
+    <div class="hidden grid grid-cols-[1fr_1fr_80px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
+      <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors" title="Sort by date">
+        <span>Date</span>
+        <i-lucide [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
+      </button>
+      <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors" title="Sort by amount">
+        <span>Amount</span>
+        <i-lucide [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
+      </button>
+      <span></span>
+    </div>
+    <div *ngFor="let item of vm.sortedExpenses" class="flex items-center gap-3 border-b border-border/70 px-5 py-4">
       <div class="grid size-9 place-items-center rounded-xl bg-accent/15">
         <i-lucide name="arrow-down-left" [size]="16"></i-lucide>
       </div>
@@ -80,7 +88,7 @@
           {{ item.category }} · {{ vm.dateLabel(item.expenseDate) }}
         </div>
       </div>
-      <div class="font-semibold">-{{ vm.money(item.amount) }}</div>
+      <div class="font-semibold amount-expense">-{{ vm.money(item.amount) }}</div>
     </div>
   </section>
 </section>

@@ -182,3 +182,44 @@
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--sidebar-border)) transparent;
 }
+
+/* Semantic amount colors - using existing theme tokens */
+/* Income / money received - uses primary (teal/green) */
+.amount-income {
+  color: hsl(var(--primary));
+}
+.dark .amount-income {
+  color: hsl(var(--primary));
+}
+
+/* Expense / money spent - uses destructive (red) */
+.amount-expense {
+  color: hsl(var(--destructive));
+}
+.dark .amount-expense {
+  color: hsl(var(--destructive));
+}
+
+/* Savings / goals - uses primary (calm teal) */
+.amount-savings {
+  color: hsl(var(--primary));
+}
+.dark .amount-savings {
+  color: hsl(var(--primary));
+}
+
+/* Investment - uses accent (orange) for distinction */
+.amount-investment {
+  color: hsl(var(--accent));
+}
+.dark .amount-investment {
+  color: hsl(var(--accent));
+}
+
+/* Neutral/other - uses muted foreground */
+.amount-neutral {
+  color: hsl(var(--muted-foreground));
+}
+.dark .amount-neutral {
+  color: hsl(var(--muted-foreground));
+}
