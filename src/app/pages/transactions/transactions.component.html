@@ -17,7 +17,7 @@
   <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-card-border bg-card p-4 shadow-soft sm:flex-row">
     <div class="relative flex-1">
       <i-lucide name="search" [size]="18"
-        class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60"></i-lucide>
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60"></i-lucide>
       <input [(ngModel)]="vm.search"
         class="w-full rounded-xl border border-input bg-background py-2.5 pl-11 pr-4 text-sm placeholder:text-muted-foreground/40 outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
         placeholder="Search transactions..." />
@@ -40,16 +40,15 @@
     <div
       class="hidden grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
       <span>Description</span><span>Category</span>
-      <button (click)="vm.toggleSort('date')"
-        class="flex items-center gap-1 justify-center hover:text-foreground transition-colors" title="Sort by date">
+      <button (click)="vm.toggleSort('date')" class="flex items-center gap-1  hover:text-foreground transition-colors"
+        title="Sort by date">
         <span>Date</span>
         <i-lucide
           [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'"
           [size]="12" class="text-muted-foreground/50"></i-lucide>
       </button>
       <button (click)="vm.toggleSort('amount')"
-        class="flex items-center gap-1 justify-center text-right hover:text-foreground transition-colors"
-        title="Sort by amount">
+        class="flex items-center gap-1 text-right hover:text-foreground transition-colors" title="Sort by amount">
         <span class="text-right">Amount</span>
         <i-lucide
           [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'"
@@ -80,8 +79,7 @@
       </div>
       <span class="text-xs text-muted-foreground">{{ item.category }}</span><span
         class="text-xs text-muted-foreground">{{ vm.dateLabel(item.transactionDate)
-        }}</span><span class="text-sm font-semibold text-right"
-        [class.amount-expense]="item.transactionType === 'Expense'"
+        }}</span><span class="text-sm font-semibold" [class.amount-expense]="item.transactionType === 'Expense'"
         [class.amount-income]="item.transactionType === 'Need'">{{ item.transactionType === "Expense" ? "-" : "+"
         }}{{ vm.money(item.amount) }}</span><button (click)="vm.deleteTransaction(item)"
         class="rounded-lg p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
