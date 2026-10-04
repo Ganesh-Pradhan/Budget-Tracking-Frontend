@@ -2,9 +2,9 @@
   *ngIf="vm.page !== 'not-found'"
   class="min-h-[100dvh] bg-background"
 >
-  <!-- SIDEBAR -->
+<!-- SIDEBAR -->
   <aside
-    class="fixed inset-y-0 left-0 z-40 flex flex-col bg-[hsl(var(--sidebar))] py-5 text-[hsl(var(--sidebar-foreground))] transition-all duration-300 lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col bg-[hsl(var(--sidebar))] py-5 text-[hsl(var(--sidebar-foreground))] transition-[width,translate,padding] duration-300 ease-out lg:translate-x-0"
     [ngClass]="
       sidebarCollapsed()
         ? 'w-[72px] px-2'
@@ -12,103 +12,103 @@
     "
     [class.translate-x-0]="vm.mobileOpen()"
     [class.-translate-x-full]="!vm.mobileOpen()"
+    style="height: 100vh; height: 100dvh;"
   >
-    <!-- SIDEBAR HEADER -->
-<!-- SIDEBAR HEADER -->
-<div
-  class="mb-9 flex items-center px-2"
-  [ngClass]="
-    sidebarCollapsed()
-      ? 'justify-center'
-      : 'justify-between'
-  "
->
-  <!-- LOGO / COLLAPSE AREA -->
-  <div
-    class="group relative"
-    [class.w-full]="!sidebarCollapsed()"
-  >
-    <!-- LOGO BUTTON -->
-    <button
-      type="button"
-      class="flex items-center gap-3 rounded-xl text-left transition-colors duration-150"
+    <!-- SIDEBAR HEADER - FIXED -->
+    <div
+      class="mb-9 flex items-center px-2 flex-shrink-0"
       [ngClass]="
         sidebarCollapsed()
           ? 'justify-center'
-          : 'w-full'
-      "
-      (click)="
-        sidebarCollapsed()
-          ? toggleSidebar()
-          : vm.nav('dashboard')
-      "
-      [attr.title]="
-        sidebarCollapsed()
-          ? 'Expand sidebar'
-          : null
+          : 'justify-between'
       "
     >
-      <!-- LOGO -->
+      <!-- LOGO / COLLAPSE AREA -->
       <div
-        class="grid size-9 shrink-0 place-items-center rounded-xl bg-[hsl(var(--sidebar-primary))] text-[hsl(var(--sidebar-primary-foreground))] transition-colors duration-150 group-hover:bg-[hsl(var(--sidebar-primary)/.85)]"
+        class="group relative"
+        [class.w-full]="!sidebarCollapsed()"
+      >
+        <!-- LOGO BUTTON -->
+        <button
+          type="button"
+          class="flex items-center gap-3 rounded-xl text-left transition-colors duration-150"
+          [ngClass]="
+            sidebarCollapsed()
+              ? 'justify-center'
+              : 'w-full'
+          "
+          (click)="
+            sidebarCollapsed()
+              ? toggleSidebar()
+              : vm.nav('dashboard')
+          "
+          [attr.title]="
+            sidebarCollapsed()
+              ? 'Expand sidebar'
+              : null
+          "
+        >
+          <!-- LOGO -->
+          <div
+            class="grid size-9 shrink-0 place-items-center rounded-xl bg-[hsl(var(--sidebar-primary))] text-[hsl(var(--sidebar-primary-foreground))] transition-colors duration-150 group-hover:bg-[hsl(var(--sidebar-primary)/.85)]"
+          >
+            <i-lucide
+              [name]="
+                sidebarCollapsed()
+                  ? 'chevrons-right'
+                  : 'sparkles'
+              "
+              [size]="18"
+            ></i-lucide>
+          </div>
+
+          <!-- BRAND -->
+          <div *ngIf="!sidebarCollapsed()">
+            <div
+              class="font-display text-lg tracking-tight"
+            >
+              Clearspace
+            </div>
+
+            <div
+              class="text-[10px] uppercase tracking-[.18em] text-[hsl(var(--sidebar-foreground)/.55)]"
+            >
+              money, made clear
+            </div>
+          </div>
+        </button>
+
+        <!-- HIDDEN COLLAPSE BUTTON WHEN EXPANDED -->
+        <button
+          *ngIf="!sidebarCollapsed()"
+          type="button"
+          class="absolute right-0 top-1/2 -translate-y-1/2 rounded-lg p-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-[hsl(var(--sidebar-accent))]"
+          (click)="toggleSidebar()"
+          aria-label="Collapse sidebar"
+        >
+          <i-lucide
+            name="chevrons-left"
+            [size]="18"
+          ></i-lucide>
+        </button>
+      </div>
+
+      <!-- MOBILE CLOSE -->
+      <button
+        type="button"
+        class="rounded-lg p-1 lg:hidden"
+        (click)="vm.mobileOpen.set(false)"
+        aria-label="Close navigation"
       >
         <i-lucide
-          [name]="
-            sidebarCollapsed()
-              ? 'chevrons-right'
-              : 'sparkles'
-          "
+          name="x"
           [size]="18"
         ></i-lucide>
-      </div>
+      </button>
+    </div>
 
-      <!-- BRAND -->
-      <div *ngIf="!sidebarCollapsed()">
-        <div
-          class="font-display text-lg tracking-tight"
-        >
-          Clearspace
-        </div>
-
-        <div
-          class="text-[10px] uppercase tracking-[.18em] text-[hsl(var(--sidebar-foreground)/.55)]"
-        >
-          money, made clear
-        </div>
-      </div>
-    </button>
-
-    <!-- HIDDEN COLLAPSE BUTTON WHEN EXPANDED -->
-    <button
-      *ngIf="!sidebarCollapsed()"
-      type="button"
-      class="absolute right-0 top-1/2 -translate-y-1/2 rounded-lg p-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-[hsl(var(--sidebar-accent))]"
-      (click)="toggleSidebar()"
-      aria-label="Collapse sidebar"
-    >
-      <i-lucide
-        name="chevrons-left"
-        [size]="18"
-      ></i-lucide>
-    </button>
-  </div>
-
-  <!-- MOBILE CLOSE -->
-  <button
-    type="button"
-    class="rounded-lg p-1 lg:hidden"
-    (click)="vm.mobileOpen.set(false)"
-    aria-label="Close navigation"
-  >
-    <i-lucide
-      name="x"
-      [size]="18"
-    ></i-lucide>
-  </button>
-</div>
-
-    <!-- NAVIGATION -->
-    <nav class="flex-1 space-y-7">
+    <!-- NAVIGATION - SCROLLABLE MIDDLE SECTION -->
+    <nav class="flex-1 overflow-y-auto space-y-7 pr-1 sidebar-nav-scroll" style="min-height: 0;">
 
       <!-- OVERVIEW -->
       <div>
@@ -120,47 +120,58 @@
         </div>
 
         <div class="space-y-1">
-          <button
-            *ngFor="let item of overviewItems"
-            (click)="vm.nav(item.p)"
-         class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))]"
-            [ngClass]="
-              sidebarCollapsed()
-                ? 'justify-center px-2'
-                : 'items-center gap-3 px-3'
-            "
-            [class.bg-[hsl(var(--sidebar-accent))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-accent-foreground))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-foreground)/.62)]]="
-              vm.page !== item.p
-            "
-            [attr.title]="
-              sidebarCollapsed()
-                ? item.l
-                : null
-            "
-          >
-            <i-lucide
-              [name]="item.i"
-              [size]="17"
-            ></i-lucide>
-
-            <span *ngIf="!sidebarCollapsed()">
-              {{ item.l }}
-            </span>
-
-            <span
-              *ngIf="
-                !sidebarCollapsed() &&
-                vm.page === item.p
+          <ng-container *ngFor="let item of overviewItems">
+            <button
+              (click)="vm.nav(item.p)"
+              class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))] relative"
+              [ngClass]="
+                sidebarCollapsed()
+                  ? 'justify-center px-2'
+                  : 'items-center gap-3 px-3 pl-3'
               "
-              class="ml-auto size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
-            ></span>
-          </button>
+              [attr.title]="
+                sidebarCollapsed()
+                  ? item.l
+                  : null
+              "
+            >
+              <!-- SELECTED BACKGROUND - PILL STYLE FOR EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-2 right-2 top-0.5 bottom-0.5 rounded-lg bg-[hsl(var(--sidebar-accent))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED LEFT INDICATOR - EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-md bg-[hsl(var(--sidebar-primary))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED INDICATOR - COLLAPSED -->
+              <div
+                *ngIf="vm.page === item.p && sidebarCollapsed()"
+                class="absolute bottom-1 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></div>
+
+              <i-lucide
+                [name]="item.i"
+                [size]="17"
+              ></i-lucide>
+
+              <span *ngIf="!sidebarCollapsed()" class="transition-opacity duration-150 ease-in-out">
+                {{ item.l }}
+              </span>
+
+              <!-- SELECTED INDICATOR - EXPANDED (right dot) -->
+              <span
+                *ngIf="
+                  !sidebarCollapsed() &&
+                  vm.page === item.p
+                "
+                class="absolute right-2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></span>
+            </button>
+          </ng-container>
         </div>
       </div>
 
@@ -174,47 +185,58 @@
         </div>
 
         <div class="space-y-1">
-          <button
-            *ngFor="let item of planItems"
-            (click)="vm.nav(item.p)"
-           class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))]"
-            [ngClass]="
-              sidebarCollapsed()
-                ? 'justify-center px-2'
-                : 'items-center gap-3 px-3'
-            "
-            [class.bg-[hsl(var(--sidebar-accent))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-accent-foreground))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-foreground)/.62)]]="
-              vm.page !== item.p
-            "
-            [attr.title]="
-              sidebarCollapsed()
-                ? item.l
-                : null
-            "
-          >
-            <i-lucide
-              [name]="item.i"
-              [size]="17"
-            ></i-lucide>
-
-            <span *ngIf="!sidebarCollapsed()">
-              {{ item.l }}
-            </span>
-
-            <span
-              *ngIf="
-                !sidebarCollapsed() &&
-                vm.page === item.p
+          <ng-container *ngFor="let item of planItems">
+            <button
+              (click)="vm.nav(item.p)"
+              class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))] relative"
+              [ngClass]="
+                sidebarCollapsed()
+                  ? 'justify-center px-2'
+                  : 'items-center gap-3 px-3 pl-3'
               "
-              class="ml-auto size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
-            ></span>
-          </button>
+              [attr.title]="
+                sidebarCollapsed()
+                  ? item.l
+                  : null
+              "
+            >
+              <!-- SELECTED BACKGROUND - PILL STYLE FOR EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-2 right-2 top-0.5 bottom-0.5 rounded-lg bg-[hsl(var(--sidebar-accent))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED LEFT INDICATOR - EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-md bg-[hsl(var(--sidebar-primary))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED INDICATOR - COLLAPSED -->
+              <div
+                *ngIf="vm.page === item.p && sidebarCollapsed()"
+                class="absolute bottom-1 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></div>
+
+              <i-lucide
+                [name]="item.i"
+                [size]="17"
+              ></i-lucide>
+
+              <span *ngIf="!sidebarCollapsed()" class="transition-opacity duration-150 ease-in-out">
+                {{ item.l }}
+              </span>
+
+              <!-- SELECTED INDICATOR - EXPANDED (right dot) -->
+              <span
+                *ngIf="
+                  !sidebarCollapsed() &&
+                  vm.page === item.p
+                "
+                class="absolute right-2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></span>
+            </button>
+          </ng-container>
         </div>
       </div>
 
@@ -228,147 +250,158 @@
         </div>
 
         <div class="space-y-1">
-          <button
-            *ngFor="let item of organizeItems"
-            (click)="vm.nav(item.p)"
-           class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))]"
-            [ngClass]="
-              sidebarCollapsed()
-                ? 'justify-center px-2'
-                : 'items-center gap-3 px-3'
-            "
-            [class.bg-[hsl(var(--sidebar-accent))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-accent-foreground))]]="
-              vm.page === item.p
-            "
-            [class.text-[hsl(var(--sidebar-foreground)/.62)]]="
-              vm.page !== item.p
-            "
-            [attr.title]="
-              sidebarCollapsed()
-                ? item.l
-                : null
-            "
-          >
-            <i-lucide
-              [name]="item.i"
-              [size]="17"
-            ></i-lucide>
-
-            <span *ngIf="!sidebarCollapsed()">
-              {{ item.l }}
-            </span>
-
-            <span
-              *ngIf="
-                !sidebarCollapsed() &&
-                vm.page === item.p
+          <ng-container *ngFor="let item of organizeItems">
+            <button
+              (click)="vm.nav(item.p)"
+              class="group flex w-full rounded-xl py-2.5 transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent)/.75)] hover:text-[hsl(var(--sidebar-foreground))] relative"
+              [ngClass]="
+                sidebarCollapsed()
+                  ? 'justify-center px-2'
+                  : 'items-center gap-3 px-3 pl-3'
               "
-              class="ml-auto size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
-            ></span>
-          </button>
+              [attr.title]="
+                sidebarCollapsed()
+                  ? item.l
+                  : null
+              "
+            >
+              <!-- SELECTED BACKGROUND - PILL STYLE FOR EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-2 right-2 top-0.5 bottom-0.5 rounded-lg bg-[hsl(var(--sidebar-accent))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED LEFT INDICATOR - EXPANDED -->
+              <div
+                *ngIf="vm.page === item.p && !sidebarCollapsed()"
+                class="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-md bg-[hsl(var(--sidebar-primary))] -z-10 pointer-events-none"
+              ></div>
+
+              <!-- SELECTED INDICATOR - COLLAPSED -->
+              <div
+                *ngIf="vm.page === item.p && sidebarCollapsed()"
+                class="absolute bottom-1 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></div>
+
+              <i-lucide
+                [name]="item.i"
+                [size]="17"
+              ></i-lucide>
+
+              <span *ngIf="!sidebarCollapsed()" class="transition-opacity duration-150 ease-in-out">
+                {{ item.l }}
+              </span>
+
+              <!-- SELECTED INDICATOR - EXPANDED (right dot) -->
+              <span
+                *ngIf="
+                  !sidebarCollapsed() &&
+                  vm.page === item.p
+                "
+                class="absolute right-2 size-1.5 rounded-full bg-[hsl(var(--sidebar-primary))]"
+              ></span>
+            </button>
+          </ng-container>
         </div>
       </div>
     </nav>
 
-    <!-- BOTTOM SECTION -->
-    <div class="space-y-2">
+    <!-- BOTTOM SECTION - FIXED -->
+    <div class="flex-shrink-0 space-y-2 pt-4 border-t border-[hsl(var(--sidebar-border))]">
 
       <!-- ADD TRANSACTION -->
-  <button
-  (click)="vm.openModal('transaction')"
-  class="group flex w-full items-center rounded-xl bg-[hsl(var(--sidebar-primary))] py-2.5 text-[13px] font-semibold text-[hsl(var(--sidebar-primary-foreground))] transition-all duration-150 hover:brightness-95"
-  [ngClass]="
-    sidebarCollapsed()
-      ? 'justify-center px-2'
-      : 'justify-center gap-2'
-  "
-  [attr.title]="
-    sidebarCollapsed()
-      ? 'Add transaction'
-      : null
-  "
->
-  <i-lucide
-    name="plus"
-    [size]="16"
-    class="transition-transform duration-150 group-hover:scale-110"
-  ></i-lucide>
+      <button
+        (click)="vm.openModal('transaction')"
+        class="group flex w-full items-center rounded-xl bg-[hsl(var(--sidebar-primary))] py-2.5 text-[13px] font-semibold text-[hsl(var(--sidebar-primary-foreground))] transition-all duration-150 hover:brightness-95"
+        [ngClass]="
+          sidebarCollapsed()
+            ? 'justify-center px-2'
+            : 'justify-center gap-2'
+        "
+        [attr.title]="
+          sidebarCollapsed()
+            ? 'Add transaction'
+            : null
+        "
+      >
+        <i-lucide
+          name="plus"
+          [size]="16"
+          class="transition-transform duration-150 group-hover:scale-110"
+        ></i-lucide>
 
-  <span *ngIf="!sidebarCollapsed()">
-    Add transaction
-  </span>
-</button>
+        <span *ngIf="!sidebarCollapsed()">
+          Add transaction
+        </span>
+      </button>
 
       <!-- SETTINGS -->
- <button
-  (click)="vm.nav('settings')"
-  class="group flex w-full rounded-xl py-2.5 text-left text-[13px] text-[hsl(var(--sidebar-foreground)/.62)] transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-foreground))]"
-  [ngClass]="
-    sidebarCollapsed()
-      ? 'justify-center px-2'
-      : 'items-center gap-3 px-3'
-  "
-  [attr.title]="
-    sidebarCollapsed()
-      ? 'Settings'
-      : null
-  "
->
-  <i-lucide
-    name="settings"
-    [size]="17"
-    class="transition-transform duration-150 group-hover:scale-105"
-  ></i-lucide>
+      <button
+        (click)="vm.nav('settings')"
+        class="group flex w-full rounded-xl py-2.5 text-left text-[13px] text-[hsl(var(--sidebar-foreground)/.62)] transition-all duration-150 hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-foreground))]"
+        [ngClass]="
+          sidebarCollapsed()
+            ? 'justify-center px-2'
+            : 'items-center gap-3 px-3'
+        "
+        [attr.title]="
+          sidebarCollapsed()
+            ? 'Settings'
+            : null
+        "
+      >
+        <i-lucide
+          name="settings"
+          [size]="17"
+          class="transition-transform duration-150 group-hover:scale-105"
+        ></i-lucide>
 
-  <span *ngIf="!sidebarCollapsed()">
-    Settings
-  </span>
-</button>
+        <span *ngIf="!sidebarCollapsed()">
+          Settings
+        </span>
+      </button>
 
       <!-- USER PROFILE -->
-<div
-  class="group flex items-center rounded-xl border-t border-[hsl(var(--sidebar-border))] pt-4"
-  [ngClass]="
-    sidebarCollapsed()
-      ? 'justify-center px-0'
-      : 'gap-3 px-2'
-  "
-  [attr.title]="
-    sidebarCollapsed()
-      ? vm.settings()?.name
-      : null
-  "
->
-  <div
-    class="grid size-8 shrink-0 place-items-center rounded-full bg-[hsl(var(--accent))] text-xs font-bold transition-transform duration-150 group-hover:scale-105"
-  >
-    {{ getInitials(vm.settings()?.name) }}
-  </div>
+      <div
+        class="group flex items-center rounded-xl border-t border-[hsl(var(--sidebar-border))] pt-4"
+        [ngClass]="
+          sidebarCollapsed()
+            ? 'justify-center px-2'
+            : 'gap-3 px-2'
+        "
+        [attr.title]="
+          sidebarCollapsed()
+            ? vm.settings()?.name
+            : null
+        "
+      >
+        <div
+          class="grid size-8 shrink-0 place-items-center rounded-full bg-[hsl(var(--accent))] text-xs font-bold transition-transform duration-150 group-hover:scale-105"
+        >
+          {{ getInitials(vm.settings()?.name) }}
+        </div>
 
-  <div
-    *ngIf="!sidebarCollapsed()"
-    class="min-w-0"
-  >
-    <div class="truncate text-xs font-medium">
-      {{ vm.settings().name }}
-    </div>
+        <div
+          *ngIf="!sidebarCollapsed()"
+          class="min-w-0"
+        >
+          <div class="truncate text-xs font-medium">
+            {{ vm.settings().name }}
+          </div>
 
-    <div
-      class="truncate text-[11px] text-[hsl(var(--sidebar-foreground)/.45)]"
-    >
-      Personal workspace
-    </div>
-  </div>
-</div>
+          <div
+            class="truncate text-[11px] text-[hsl(var(--sidebar-foreground)/.45)]"
+          >
+            Personal workspace
+          </div>
+        </div>
+      </div>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
   <div
-    class="transition-[padding] duration-300"
+    class="transition-[padding-left] duration-300"
     [ngClass]="
       sidebarCollapsed()
         ? 'lg:pl-[72px]'
