@@ -1,11 +1,7 @@
 <section class="animate-in">
-  <div
-    class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
-  >
+  <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <div
-        class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
-      >
+      <div class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary">
         Overview / activity
       </div>
       <h1 class="font-display text-[2.4rem]">Transactions</h1>
@@ -13,73 +9,51 @@
         Every movement, in one calm place.
       </p>
     </div>
-    <button
-      (click)="vm.openModal('transaction')"
-      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"
-    >
+    <button (click)="vm.openModal('transaction')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
       <i-lucide name="plus" [size]="16"></i-lucide>Add transaction
     </button>
   </div>
-  <div
-    class="mb-5 flex flex-col gap-3 rounded-2xl border border-card-border bg-card p-4 shadow-soft sm:flex-row"
-  >
+  <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-card-border bg-card p-4 shadow-soft sm:flex-row">
     <div class="relative flex-1">
-      <i-lucide
-        name="search"
-        [size]="16"
-        class="absolute left-3 top-3 text-muted-foreground"
-      ></i-lucide
-      ><input
-        [(ngModel)]="vm.search"
-        class="w-full rounded-xl border border-input bg-background py-2.5 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-primary/30"
-        placeholder="Search transactions..."
-      />
+      <i-lucide name="search" [size]="18"
+        class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60"></i-lucide>
+      <input [(ngModel)]="vm.search"
+        class="w-full rounded-xl border border-input bg-background py-2.5 pl-11 pr-4 text-sm placeholder:text-muted-foreground/40 outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+        placeholder="Search transactions..." />
     </div>
-    <select
-      [(ngModel)]="vm.filterType"
-      class="rounded-xl border border-input bg-background px-3 py-2.5 text-sm"
-    >
-      <option>All</option>
-      <option>Expense</option>
-      <option>Need</option></select
-    ><select
-      [(ngModel)]="vm.filterMode"
-      class="rounded-xl border border-input bg-background px-3 py-2.5 text-sm"
-    >
-      <option>All</option>
-      <option *ngFor="let p of vm.paymentModes">{{ p }}</option>
-    </select>
+    <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+      <select [(ngModel)]="vm.filterType"
+        class="w-full sm:w-[160px] rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50  cursor-pointer transition-all">
+        <option>All</option>
+        <option>Expense</option>
+        <option>Need</option>
+      </select>
+      <select [(ngModel)]="vm.filterMode"
+        class="w-full sm:w-[160px] rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50  cursor-pointer transition-all">
+        <option>All</option>
+        <option *ngFor="let p of vm.paymentModes">{{ p }}</option>
+      </select>
+    </div>
   </div>
-  <section
-    class="overflow-hidden rounded-2xl border border-card-border bg-card shadow-soft"
-  >
+  <section class="rounded-2xl border border-card-border bg-card shadow-soft">
     <div
-      class="hidden grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid"
-    >
-      <span>Description</span><span>Category</span><span>Date</span
-      ><span>Amount</span><span></span>
+      class="hidden grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
+      <span>Description</span><span>Category</span><span>Date</span><span class="text-right">Amount</span><span></span>
     </div>
-<div
-        *ngFor="let item of vm.filteredTransactions"
-        class="grid items-center gap-3 border-b border-border/70 px-5 py-4 sm:grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px]"
-      >
+    <div *ngFor="let item of vm.filteredTransactions; let i = index"
+      class="grid items-center gap-3 border-b border-border/50 px-5 py-4 hover:bg-muted/30 transition-colors sm:grid-cols-[1.6fr_.7fr_.8fr_.8fr_40px]">
       <div class="flex items-center gap-3">
-        <div
-          class="grid size-9 place-items-center rounded-xl"
-          [ngClass]="
+        <div class="grid size-9 place-items-center rounded-xl" [ngClass]="
             item.transactionType === 'Expense'
               ? 'bg-accent/15 text-accent-foreground'
               : 'bg-blue/15 text-blue'
-          "
-        >
-          <i-lucide
-            [name]="
+          ">
+          <i-lucide [name]="
               item.transactionType === 'Expense'
                 ? 'arrow-down-left'
                 : 'heart'
-            "
-            [size]="16"
-          ></i-lucide>
+            " [size]="16"></i-lucide>
         </div>
         <div>
           <div class="text-sm font-medium">{{ item.description }}</div>
@@ -88,28 +62,34 @@
           </div>
         </div>
       </div>
-      <span class="text-xs text-muted-foreground">{{ item.category }}</span
-      ><span class="text-xs text-muted-foreground">{{
+      <span class="text-xs text-muted-foreground">{{ item.category }}</span><span
+        class="text-xs text-muted-foreground">{{
         vm.dateLabel(item.transactionDate)
-      }}</span
-      ><span
-        class="text-sm font-semibold"
-        [class.text-accent-foreground]="item.transactionType === 'Expense'"
-        [class.text-blue]="item.transactionType === 'Need'"
-        >{{ item.transactionType === "Expense" ? "-" : "+"
-        }}{{ vm.money(item.amount) }}</span
-      ><button
-        (click)="vm.deleteTransaction(item)"
-        class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
-      >
+        }}</span><span class="text-sm font-semibold text-right"
+        [class.text-destructive]="item.transactionType === 'Expense'"
+        [class.text-blue]="item.transactionType === 'Need'">{{ item.transactionType === "Expense" ? "-" : "+"
+        }}{{ vm.money(item.amount) }}</span><button (click)="vm.deleteTransaction(item)"
+        class="rounded-lg p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
         <i-lucide name="trash-2" [size]="14"></i-lucide>
       </button>
     </div>
-    <div
-      *ngIf="vm.filteredTransactions.length === 0"
-      class="p-10 text-center text-sm text-muted-foreground"
-    >
+    <div *ngIf="vm.filteredTransactions.length === 0" class="p-10 text-center text-sm text-muted-foreground">
       No transactions match your filters.
+    </div>
+    <div class="px-5 py-3 border-t border-border/50 bg-muted/20">
+      <p class="text-[11px] text-muted-foreground flex items-center justify-between">
+        <span>
+          Showing
+          <span class="font-medium text-foreground">{{
+            vm.filteredTransactions.length
+            }}</span>
+          of
+          <span class="font-medium text-foreground">{{
+            vm.filteredTransactions.length
+            }}</span>
+          transactions
+        </span>
+      </p>
     </div>
   </section>
 </section>
