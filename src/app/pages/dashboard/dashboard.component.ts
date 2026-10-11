@@ -1,4 +1,4 @@
-import { Component, inject, HostListener } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
@@ -23,10 +23,7 @@ export class DashboardPageComponent {
   vm = inject(BudgetService);
   Math = Math;
 
-  @HostListener("document:click")
-  onDocumentClick() {
-    this.vm.chartMetricMenuOpen.set(false);
-  }
+
 
   get summaryCards(): SummaryCard[] {
     return [
