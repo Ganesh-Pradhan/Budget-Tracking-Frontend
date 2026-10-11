@@ -95,10 +95,67 @@
             Your spending rhythm this month
           </p>
         </div>
-        <button class="rounded-lg p-2 text-muted-foreground hover:bg-muted">
-          <i-lucide name="ellipsis" [size]="18"></i-lucide>
-        </button>
-      </div>
+        <div class="relative">
+          <button
+            (click)="$event.stopPropagation(); vm.chartMetricMenuOpen.set(!vm.chartMetricMenuOpen())"
+            class="rounded-lg p-2 text-muted-foreground hover:bg-muted"
+          >
+            <i-lucide name="ellipsis" [size]="18"></i-lucide>
+          </button>
+          <div
+            [hidden]="!vm.chartMetricMenuOpen()"
+            class="absolute right-0 top-full mt-1 z-10 w-40 rounded-xl border border-card-border bg-card p-2 shadow-lift animate-in"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="px-2 py-1 text-[10px] font-semibold uppercase tracking-[.16em] text-muted-foreground">
+              Chart
+            </div>
+            <button
+              (click)="vm.setChartMetric('expenses')"
+              class="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-accent/10 transition-colors"
+              [class.bg-accent/10]="vm.chartMetric() === 'expenses'"
+            >
+              <i-lucide
+                [name]="vm.chartMetric() === 'expenses' ? 'check' : 'arrow-down-left'"
+                [size]="14"
+                class="text-accent-foreground"
+              ></i-lucide>
+              Expenses
+            </button>
+            <button
+              (click)="vm.setChartMetric('income')"
+              class="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-primary/10 transition-colors"
+              [class.bg-primary/10]="vm.chartMetric() === 'income'"
+            >
+              <i-lucide
+                [name]="vm.chartMetric() === 'income' ? 'check' : 'arrow-up-right'"
+                [size]="14"
+                class="text-primary"
+              ></i-lucide>
+              Income
+            </button>
+            <button
+              (click)="vm.setChartMetric('net')"
+              class="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-blue/10 transition-colors"
+              [class.bg-blue/10]="vm.chartMetric() === 'net'"
+            >
+              <i-lucide
+                [name]="vm.chartMetric() === 'net' ? 'check' : 'minus'"
+                [size]="14"
+                class="text-blue"
+              ></i-lucide>
+              Net Balance
+            </button>
+            <div class="border-t border-border my-2"></div>
+            <button
+              (click)="vm.nav('reports')"
+              class="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-muted transition-colors"
+            >
+              <i-lucide name="file-text" [size]="14" class="text-muted-foreground"></i-lucide>
+              View full report
+            </button>
+          </div>
+        </div>
       <div class="grid gap-6 md:grid-cols-[1fr_190px]">
         <div class="relative h-[180px]">
           <div
@@ -182,6 +239,7 @@
           </div>
         </div>
       </div>
+    </div>
     </section>
     <section
       class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-6"

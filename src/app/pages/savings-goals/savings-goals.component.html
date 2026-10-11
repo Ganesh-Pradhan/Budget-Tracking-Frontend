@@ -29,12 +29,21 @@
         >
           <i-lucide name="target" [size]="19"></i-lucide>
         </div>
-        <button
-          (click)="vm.deleteItem('goals', g.goalId)"
-          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
-        >
-          <i-lucide name="trash-2" [size]="14"></i-lucide>
-        </button>
+        <div class="flex items-center gap-1">
+          <button
+            (click)="vm.openModal('goal', g)"
+            class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+            title="Edit goal"
+          >
+            <i-lucide name="pencil" [size]="14"></i-lucide>
+          </button>
+          <button
+            (click)="vm.deleteItem('goals', g.goalId)"
+            class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+          >
+            <i-lucide name="trash-2" [size]="14"></i-lucide>
+          </button>
+        </div>
       </div>
       <h2 class="mt-7 font-display text-xl">{{ g.goalName }}</h2>
       <div class="mt-1 text-xs text-muted-foreground">

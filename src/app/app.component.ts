@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterOutlet } from "@angular/router";
 import { LucideAngularModule } from "lucide-angular";
 import { BudgetService } from "./services/budget.service";
+import { ConfirmService } from "./services/confirm.service";
 import { NavItem } from "./models";
 
 @Component({
@@ -21,6 +22,7 @@ export class AppComponent implements OnInit {
   Math = Math;
 
   vm = inject(BudgetService);
+  confirm = inject(ConfirmService);
 
   overviewItems: NavItem[] = [
     { p: "dashboard", l: "Dashboard", i: "house" },

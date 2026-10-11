@@ -2,6 +2,7 @@ import { Injectable, computed, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { ApiService } from "./api.service";
 import { StorageService } from "./storage.service";
+import { ConfirmService } from "./confirm.service";
 import { Transaction } from "../models";
 
 /**
@@ -30,6 +31,8 @@ export class BudgetService {
   apiChecking = false;
   apiStatus: "idle" | "success" | "error" = "idle";
   saving = signal(false);
+  chartMetric = signal<"expenses" | "income" | "net">("expenses");
+  chartMetricMenuOpen = signal(false);
 
   months = this.buildMonths();
   categories: string[] = [];
@@ -56,6 +59,7 @@ export class BudgetService {
     private storage: StorageService,
     private router: Router,
     private api: ApiService,
+    private confirm: ConfirmService,
   ) {
     this.store = this.storage.store;
     this.settings = this.storage.settings;
@@ -208,17 +212,44 @@ export class BudgetService {
   get monthDailyBars() {
     const [year, month] = this.month().split("-").map(Number);
     const days = new Date(year, month, 0).getDate();
-    const daily = Array.from({ length: days }, (_, i) =>
-      this.store()
-        .expenses.filter(
-          (e) =>
-            e.expenseDate ===
-            `${this.month()}-${String(i + 1).padStart(2, "0")}`,
-        )
-        .reduce((sum, e) => sum + e.amount, 0),
-    );
-    const max = Math.max(...daily, 1);
-    return daily.map((v) => Math.max(3, Math.round((v / max) * 100)));
+    let daily: number[] = [];
+    const metric = this.chartMetric();
+    
+    if (metric === "expenses") {
+      daily = Array.from({ length: days }, (_, i) =>
+        this.store()
+          .expenses.filter(
+            (e) =>
+              e.expenseDate ===
+              `${this.month()}-${String(i + 1).padStart(2, "0")}`,
+          )
+          .reduce((sum, e) => sum + e.amount, 0),
+      );
+    } else if (metric === "income") {
+      daily = Array.from({ length: days }, (_, dayIndex) =>
+        this.store()
+          .incomes.filter(
+            (inc) =>
+              inc.incomeDate ===
+              `${this.month()}-${String(dayIndex + 1).padStart(2, "0")}`,
+          )
+          .reduce((sum, inc) => sum + inc.amount, 0),
+      );
+    } else if (metric === "net") {
+      daily = Array.from({ length: days }, (_, dayIndex) => {
+        const dateStr = `${this.month()}-${String(dayIndex + 1).padStart(2, "0")}`;
+        const expenses = this.store()
+          .expenses.filter((e) => e.expenseDate === dateStr)
+          .reduce((sum, e) => sum + e.amount, 0);
+        const income = this.store()
+          .incomes.filter((inc) => inc.incomeDate === dateStr)
+          .reduce((sum, inc) => sum + inc.amount, 0);
+        return income - expenses;
+      });
+    }
+    
+    const max = Math.max(...daily.map(Math.abs), 1);
+    return daily.map((v) => Math.max(3, Math.round((Math.abs(v) / max) * 100)));
   }
 
   get monthChartLabels(): string[] {
@@ -396,6 +427,11 @@ export class BudgetService {
       this.sortColumn.set(column);
       this.sortDirection.set("asc");
     }
+  }
+
+  setChartMetric(metric: "expenses" | "income" | "net") {
+    this.chartMetric.set(metric);
+    this.chartMetricMenuOpen.set(false);
   }
 
   get accounts() {
@@ -722,8 +758,13 @@ export class BudgetService {
     return this.connection() === "connected" && this.storage.online();
   }
 
-  async deleteTransaction(t: Transaction) {
-    if (!confirm("Delete this transaction?")) return;
+async deleteTransaction(t: Transaction) {
+    const confirmed = await this.confirm.confirm(
+      "Delete transaction?",
+      `Are you sure you want to delete "${t.description}"?\nThis action cannot be undone.`,
+      { confirmText: "Delete", cancelText: "Cancel" }
+    );
+    if (!confirmed) return;
     try {
       if (!this.connectionIsAvailable())
         throw new Error("API is not connected.");
@@ -739,19 +780,25 @@ export class BudgetService {
   }
 
   async deleteItem(type: "goals" | "accounts" | "bills", id: number) {
-    if (
-      !confirm(
-        `Delete this ${type === "bills" ? "recurring bill" : type === "accounts" ? "account" : "goal"}?`,
-      )
-    )
-      return;
+    const typeLabel =
+      type === "bills"
+        ? "recurring bill"
+        : type === "accounts"
+        ? "account"
+        : "goal";
+    const confirmed = await this.confirm.confirm(
+      `Delete ${typeLabel}?`,
+      `Are you sure you want to delete this ${typeLabel}?\nThis action cannot be undone.`,
+      { confirmText: "Delete", cancelText: "Cancel" }
+    );
+    if (!confirmed) return;
     try {
       const path =
         type === "goals"
           ? "savingsgoals"
           : type === "accounts"
-            ? "accounts"
-            : "recurringtransactions";
+          ? "accounts"
+          : "recurringtransactions";
       if (!this.connectionIsAvailable())
         throw new Error("API is not connected.");
       await this.api.delete(this.settings().apiBaseUrl, `/api/${path}/${id}`);
