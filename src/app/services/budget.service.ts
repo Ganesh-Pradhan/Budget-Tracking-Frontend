@@ -134,7 +134,29 @@ export class BudgetService {
     this.reportMonths.set(values);
   }
 
+  private currentMonthString() {
+    return new Date().toISOString().slice(0, 7);
+  }
+
+  isCurrentMonthOrLater(v: string): boolean {
+    return v >= this.currentMonthString();
+  }
+
+  isFutureMonth(v: string): boolean {
+    return v > this.currentMonthString();
+  }
+
+  async normalizeMonth() {
+    if (this.isFutureMonth(this.month())) {
+      this.month.set(this.currentMonthString());
+      await this.loadBudget();
+      this.loadReportMonths();
+    }
+  }
+
   async changeMonth(value: string) {
+    await this.normalizeMonth();
+    if (this.isFutureMonth(value)) return;
     this.month.set(value);
     await this.loadBudget();
     this.loadReportMonths();

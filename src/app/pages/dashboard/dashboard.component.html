@@ -19,7 +19,7 @@
         " class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted">
         <i-lucide name="chevron-left" [size]="15"></i-lucide></button><select [ngModel]="vm.month()"
         (ngModelChange)="vm.changeMonth($event)" class="bg-transparent px-1 text-xs font-medium outline-none">
-        <option *ngFor="let m of vm.months" [value]="m">
+        <option *ngFor="let m of vm.months" [value]="m" [disabled]="vm.isFutureMonth(m)">
           {{ vm.monthLabel(m) }}
         </option>
       </select><button (click)="
@@ -28,7 +28,10 @@
               Math.min(vm.months.length - 1, vm.months.indexOf(vm.month()) + 1)
             ]
           )
-        " class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted">
+        " [disabled]="vm.isCurrentMonthOrLater(vm.month())"
+        class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted"
+        [class.opacity-50]="vm.isCurrentMonthOrLater(vm.month())"
+        [class.cursor-not-allowed]="vm.isCurrentMonthOrLater(vm.month())">
         <i-lucide name="chevron-right" [size]="15"></i-lucide>
       </button>
     </div>

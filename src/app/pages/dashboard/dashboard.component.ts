@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
@@ -19,9 +19,13 @@ interface SummaryCard {
   templateUrl: "./dashboard.component.html",
   styleUrl: "./dashboard.component.css",
 })
-export class DashboardPageComponent {
+export class DashboardPageComponent implements OnInit {
   vm = inject(BudgetService);
   Math = Math;
+
+  async ngOnInit() {
+    await this.vm.normalizeMonth();
+  }
 
 
 
