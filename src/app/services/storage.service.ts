@@ -94,9 +94,9 @@ export class StorageService {
           baseUrl,
           `/api/recurringtransactions?userId=${this.userId}`,
         ),
-        this.api.get<any>(baseUrl, `/api/categories`),
-        this.api.get<any>(baseUrl, `/api/paymentmodes`),
-        this.api.get<any>(baseUrl, `/api/incomesources`),
+        this.getAllPages(baseUrl, `/api/categories`),
+        this.getAllPages(baseUrl, `/api/paymentmodes`),
+        this.getAllPages(baseUrl, `/api/incomesources`),
       ]);
 
       const accountRows = this.rows(accounts);
@@ -249,28 +249,29 @@ export class StorageService {
 
   private async getAllPages(baseUrl: string, path: string): Promise<any[]> {
     const pageSize = 100;
+    const separator = path.includes("?") ? "&" : "?";
     const first = await this.api.get<any>(
       baseUrl,
-      `${path}&page=1&pageSize=${pageSize}`,
+      `${path}${separator}page=1&pageSize=${pageSize}`,
     );
     if (Array.isArray(first)) return first;
 
-    const firstRows = first?.data || [];
-    const totalPages = Number(first?.totalPages || 1);
+    const firstRows = (first?.data ?? first?.Data) || [];
+    const totalPages = Number((first?.totalPages ?? first?.TotalPages) || 1);
     if (totalPages <= 1) return firstRows;
 
     const pages = await Promise.all(
       Array.from({ length: totalPages - 1 }, (_, index) =>
         this.api.get<any>(
           baseUrl,
-          `${path}&page=${index + 2}&pageSize=${pageSize}`,
+          `${path}${separator}page=${index + 2}&pageSize=${pageSize}`,
         ),
       ),
     );
 
     return [
       firstRows,
-      ...pages.map((x) => (Array.isArray(x) ? x : x?.data || [])),
+      ...pages.map((x) => (Array.isArray(x) ? x : (x?.data ?? x?.Data) || [])),
     ].flat();
   }
 
