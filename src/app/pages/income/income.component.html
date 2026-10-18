@@ -63,7 +63,23 @@
           {{ item.source }} · {{ vm.dateLabel(item.incomeDate) }}
         </div>
       </div>
-      <div class="font-semibold amount-income">+{{ vm.money(item.amount) }}</div>
+      <div class="flex items-center gap-2">
+        <div class="font-semibold amount-income">+{{ vm.money(item.amount) }}</div>
+        <button
+          (click)="vm.openModal('income', item)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          title="Edit income"
+        >
+          <i-lucide name="pencil" [size]="14"></i-lucide>
+        </button>
+        <button
+          (click)="vm.deleteIncome(item)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+          title="Delete income"
+        >
+          <i-lucide name="trash-2" [size]="14"></i-lucide>
+        </button>
+      </div>
     </div>
   </section>
 </section>

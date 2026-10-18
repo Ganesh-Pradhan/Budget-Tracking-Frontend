@@ -78,12 +78,22 @@
       </div>
       <span class="text-xs text-muted-foreground">{{ item.category }}</span><span
         class="text-xs text-muted-foreground">{{ vm.dateLabel(item.transactionDate)
-        }}</span><span class="text-sm font-semibold" [class.amount-expense]="item.transactionType === 'Expense'"
+        }}</span><div class="flex items-center gap-2">
+        <span class="text-sm font-semibold" [class.amount-expense]="item.transactionType === 'Expense'"
         [class.amount-income]="item.transactionType === 'Need'">{{ item.transactionType === "Expense" ? "-" : "+"
-        }}{{ vm.money(item.amount) }}</span><button (click)="vm.deleteTransaction(item)"
-        class="rounded-lg p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
-        <i-lucide name="trash-2" [size]="14"></i-lucide>
-      </button>
+        }}{{ vm.money(item.amount) }}</span>
+        <button
+          (click)="vm.openModal('transaction', item)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          title="Edit transaction"
+        >
+          <i-lucide name="pencil" [size]="14"></i-lucide>
+        </button>
+        <button (click)="vm.deleteTransaction(item)"
+          class="rounded-lg p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all">
+          <i-lucide name="trash-2" [size]="14"></i-lucide>
+        </button>
+      </div>
     </div>
     <div *ngIf="vm.filteredTransactions.length === 0" class="p-10 text-center text-sm text-muted-foreground">
       No transactions match your filters.

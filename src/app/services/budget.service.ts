@@ -801,6 +801,48 @@ async deleteTransaction(t: Transaction) {
     }
   }
 
+  async deleteIncome(income: any) {
+    const confirmed = await this.confirm.confirm(
+      "Delete income?",
+      `Are you sure you want to delete "${income.description}"?\nThis action cannot be undone.`,
+      { confirmText: "Delete", cancelText: "Cancel" }
+    );
+    if (!confirmed) return;
+    try {
+      if (!this.connectionIsAvailable())
+        throw new Error("API is not connected.");
+      await this.api.delete(
+        this.settings().apiBaseUrl,
+        `/api/incomes/${income.incomeId}`,
+      );
+      await this.storage.syncFromApi();
+      this.notify("Income deleted");
+    } catch (error: any) {
+      this.notify(error?.message || "Could not delete income", "error");
+    }
+  }
+
+  async deleteExpense(expense: any) {
+    const confirmed = await this.confirm.confirm(
+      "Delete expense?",
+      `Are you sure you want to delete "${expense.description}"?\nThis action cannot be undone.`,
+      { confirmText: "Delete", cancelText: "Cancel" }
+    );
+    if (!confirmed) return;
+    try {
+      if (!this.connectionIsAvailable())
+        throw new Error("API is not connected.");
+      await this.api.delete(
+        this.settings().apiBaseUrl,
+        `/api/expenses/${expense.expenseId}`,
+      );
+      await this.storage.syncFromApi();
+      this.notify("Expense deleted");
+    } catch (error: any) {
+      this.notify(error?.message || "Could not delete expense", "error");
+    }
+  }
+
   async deleteItem(type: "goals" | "accounts" | "bills", id: number) {
     const typeLabel =
       type === "bills"
