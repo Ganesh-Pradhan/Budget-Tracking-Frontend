@@ -115,7 +115,74 @@
   body { @apply font-sans antialiased bg-background text-foreground; margin: 0; }
   button, input, select, textarea { font: inherit; }
   button { cursor: pointer; }
-  
+
+  /* ===== Shared Dropdown / Select styling ===== */
+  select {
+    @apply rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none cursor-pointer transition-colors;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+  }
+
+  select:hover {
+    @apply border-primary/50;
+  }
+
+  select:focus {
+    @apply ring-2 ring-primary/30 border-primary/50;
+  }
+
+  select option {
+    padding: 0.5625rem 0.75rem;
+    cursor: pointer;
+  }
+
+  select option:hover {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+  }
+
+  select option:checked {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  /* Subtle scrollbar for select dropdowns */
+  select::-webkit-scrollbar {
+    width: 6px;
+  }
+  select::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  select::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+    opacity: 0.6;
+  }
+  select::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Dark mode adjustments for selects */
+  .dark select {
+    @apply border-input bg-card;
+  }
+  .dark select option {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  .dark select option:hover {
+    background-color: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary));
+  }
+  .dark select option:checked {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
   /* Ensure native date picker works */
   input[type="date"] {
     position: relative;

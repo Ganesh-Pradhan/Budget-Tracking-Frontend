@@ -1,0 +1,31 @@
+<div class="custom-select relative" [class.opacity-50]="disabled" [class.cursor-not-allowed]="disabled">
+  <button
+    type="button"
+    (click)="toggle()"
+    [disabled]="disabled"
+    class="custom-select-trigger w-full flex items-center justify-between rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 cursor-pointer transition-colors text-left"
+    [attr.aria-expanded]="isOpen"
+  >
+    <span class="truncate text-foreground">{{ displayValue || placeholder }}</span>
+    <i-lucide name="chevron-down" [size]="14" class="text-muted-foreground/50 transition-transform duration-200" [class.rotate-180]="isOpen"></i-lucide>
+  </button>
+
+  <div
+    *ngIf="isOpen"
+    class="custom-select-list absolute z-50 mt-1 w-full rounded-xl border border-input bg-card shadow-lg max-h-[200px] overflow-y-auto"
+  >
+    <div
+      *ngFor="let option of options"
+      (click)="select(option)"
+      class="custom-select-option px-3 py-2 text-sm cursor-pointer"
+      [class.bg-primary]="isSelected(option)"
+      [class.text-primary-foreground]="isSelected(option)"
+      [class.text-foreground]="!isSelected(option)"
+      [class.hover:bg-accent]="!isSelected(option) && !isOptionDisabled(option)"
+      [class.text-muted-foreground/40]="isOptionDisabled(option)"
+      [class.cursor-not-allowed]="isOptionDisabled(option)"
+    >
+      {{ getOptionLabel(option) }}
+    </div>
+  </div>
+</div>

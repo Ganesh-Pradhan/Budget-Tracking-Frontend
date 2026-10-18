@@ -552,14 +552,12 @@
       >
         Movement type
 
-        <select
+        <app-custom-select
           [(ngModel)]="vm.form.type"
           name="type"
-          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-        >
-          <option>Expense</option>
-          <option>Need</option>
-        </select>
+          [options]="['Expense', 'Need']"
+          class="mt-2 w-full"
+        ></app-custom-select>
       </label>
 
       <!-- DESCRIPTION / NAME -->
@@ -611,19 +609,15 @@
   >
     Source
 
-    <select
+    <app-custom-select
       required
       [(ngModel)]="vm.form.extra"
       name="income-source"
-      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-    >
-      <option
-        *ngFor="let source of vm.apiIncomeSources"
-        [value]="source.name"
-      >
-        {{ source.name }}
-      </option>
-    </select>
+      [options]="vm.apiIncomeSources"
+      labelField="name"
+      valueField="name"
+      class="mt-2 w-full"
+    ></app-custom-select>
   </label>
 
   <!-- DATE (for transaction, income, expense, bill) -->
@@ -694,17 +688,12 @@
     class="block text-xs font-semibold"
   >
     Frequency
-    <select
+    <app-custom-select
       [(ngModel)]="vm.form.extra"
       name="bill-frequency"
-      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-    >
-      <option value="Weekly">Weekly</option>
-      <option value="BiWeekly">Bi-Weekly</option>
-      <option value="Monthly">Monthly</option>
-      <option value="Quarterly">Quarterly</option>
-      <option value="Yearly">Yearly</option>
-    </select>
+      [options]="['Weekly', 'BiWeekly', 'Monthly', 'Quarterly', 'Yearly']"
+      class="mt-2 w-full"
+    ></app-custom-select>
   </label>
 
   <!-- BANK NAME (ACCOUNT) -->
@@ -734,17 +723,12 @@
       >
         Category
 
-        <select
+        <app-custom-select
           [(ngModel)]="vm.form.category"
           name="category"
-          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-        >
-          <option
-            *ngFor="let c of vm.categories"
-          >
-            {{ c }}
-          </option>
-        </select>
+          [options]="vm.categories"
+          class="mt-2 w-full"
+        ></app-custom-select>
       </label>
 
       <!-- PAYMENT MODE -->
@@ -758,18 +742,14 @@
       >
         Payment mode
 
-        <select
+        <app-custom-select
           [(ngModel)]="vm.form.paymentModeId"
           name="paymentModeId"
-          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-        >
-          <option
-            *ngFor="let p of vm.apiPaymentModes"
-            [value]="p.id"
-          >
-            {{ p.name }}
-          </option>
-        </select>
+          [options]="vm.apiPaymentModes"
+          labelField="name"
+          valueField="id"
+          class="mt-2 w-full"
+        ></app-custom-select>
       </label>
 
       <!-- ACCOUNT -->
@@ -783,18 +763,14 @@
       >
         Account
 
-        <select
+        <app-custom-select
           [(ngModel)]="vm.form.accountId"
           name="accountId"
-          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-        >
-          <option
-            *ngFor="let a of vm.accounts"
-            [value]="a.accountId"
-          >
-            {{ a.accountName }}
-          </option>
-        </select>
+          [options]="vm.accounts"
+          labelField="accountName"
+          valueField="accountId"
+          class="mt-2 w-full"
+        ></app-custom-select>
       </label>
 
       <!-- MODAL BUTTONS -->

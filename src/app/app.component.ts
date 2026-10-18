@@ -6,6 +6,7 @@ import { LucideAngularModule } from "lucide-angular";
 import { BudgetService } from "./services/budget.service";
 import { ConfirmService } from "./services/confirm.service";
 import { NavItem } from "./models";
+import { CustomSelectComponent } from "./components/ui/custom-select/custom-select.component";
 
 @Component({
   selector: "app-root",
@@ -15,6 +16,7 @@ import { NavItem } from "./models";
     FormsModule,
     LucideAngularModule,
     RouterOutlet,
+    CustomSelectComponent,
   ],
   templateUrl: "./app.component.html",
 })

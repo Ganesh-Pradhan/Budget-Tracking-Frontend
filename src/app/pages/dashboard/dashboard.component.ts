@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
 import { BudgetService } from "../../services/budget.service";
+import { CustomSelectComponent } from "../../components/ui/custom-select/custom-select.component";
 
 interface SummaryCard {
   l: string;
@@ -15,7 +16,7 @@ interface SummaryCard {
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, CustomSelectComponent],
   templateUrl: "./dashboard.component.html",
   styleUrl: "./dashboard.component.css",
 })
@@ -28,6 +29,14 @@ export class DashboardPageComponent implements OnInit {
   }
 
 
+
+  get monthOptions() {
+    return this.vm.months.map((m) => ({
+      label: this.vm.monthLabel(m),
+      value: m,
+      disabled: this.vm.isFutureMonth(m),
+    }));
+  }
 
   get summaryCards(): SummaryCard[] {
     return [

@@ -23,17 +23,16 @@
         placeholder="Search transactions..." />
     </div>
     <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
-      <select [(ngModel)]="vm.filterType"
-        class="w-full sm:w-[160px] rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50  cursor-pointer transition-all">
-        <option>All</option>
-        <option>Expense</option>
-        <option>Need</option>
-      </select>
-      <select [(ngModel)]="vm.filterMode"
-        class="w-full sm:w-[160px] rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50  cursor-pointer transition-all">
-        <option>All</option>
-        <option *ngFor="let p of vm.paymentModes">{{ p }}</option>
-      </select>
+      <app-custom-select
+        [(ngModel)]="vm.filterType"
+        [options]="['All', 'Expense', 'Need']"
+        class="w-full sm:w-[160px]"
+      ></app-custom-select>
+      <app-custom-select
+        [(ngModel)]="vm.filterMode"
+        [options]="filterModeOptions"
+        class="w-full sm:w-[160px]"
+      ></app-custom-select>
     </div>
   </div>
   <section class="rounded-2xl border border-card-border bg-card shadow-soft">

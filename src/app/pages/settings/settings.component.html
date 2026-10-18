@@ -43,15 +43,16 @@
       </div>
       <div class="grid gap-5 sm:grid-cols-2">
         <label class="text-xs font-semibold"
-          >Currency<select
-            [ngModel]="vm.settings().currency"
-            (ngModelChange)="vm.updateSetting({ currency: $event })"
-            class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
-          >
-            <option value="USD">USD · US Dollar</option>
-            <option value="EUR">EUR · Euro</option>
-            <option value="GBP">GBP · Pound Sterling</option>
-          </select></label
+          >Currency<app-custom-select
+            [value]="vm.settings().currency"
+            (valueChange)="vm.updateSetting({ currency: $event })"
+            [options]="[
+              { value: 'USD', label: 'USD · US Dollar' },
+              { value: 'EUR', label: 'EUR · Euro' },
+              { value: 'GBP', label: 'GBP · Pound Sterling' }
+            ]"
+            class="mt-2 w-full"
+          ></app-custom-select></label
         >
         <div class="text-xs font-semibold">
           Theme

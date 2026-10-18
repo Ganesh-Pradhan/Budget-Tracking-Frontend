@@ -17,12 +17,14 @@
             vm.months[Math.max(0, vm.months.indexOf(vm.month()) - 1)]
           )
         " class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted">
-        <i-lucide name="chevron-left" [size]="15"></i-lucide></button><select [ngModel]="vm.month()"
-        (ngModelChange)="vm.changeMonth($event)" class="bg-transparent px-1 text-xs font-medium outline-none">
-        <option *ngFor="let m of vm.months" [value]="m" [disabled]="vm.isFutureMonth(m)">
-          {{ vm.monthLabel(m) }}
-        </option>
-      </select><button (click)="
+        <i-lucide name="chevron-left" [size]="15"></i-lucide></button><app-custom-select
+        [value]="vm.month()"
+        (valueChange)="vm.changeMonth($event)"
+        [options]="monthOptions"
+        labelField="label"
+        valueField="value"
+        class="bg-transparent px-1 text-xs font-medium outline-none"
+      ></app-custom-select><button (click)="
           vm.changeMonth(
             vm.months[
               Math.min(vm.months.length - 1, vm.months.indexOf(vm.month()) + 1)
