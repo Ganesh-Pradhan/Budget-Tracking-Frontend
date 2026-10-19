@@ -31,6 +31,9 @@ export class BudgetService {
   apiChecking = false;
   apiStatus: "idle" | "success" | "error" = "idle";
   saving = signal(false);
+  contributionAmount = "";
+  contributionError: string | null = null;
+  contributionTarget: any = null;
   chartMetric = signal<"expenses" | "income" | "net">("expenses");
   chartMetricMenuOpen = signal(false);
 
@@ -498,7 +501,13 @@ export class BudgetService {
 
   openModal(type: string, item?: any) {
     this.modal.set(type);
-    this.editing = item || null;
+    // 'add-money' is not an edit operation: keep `editing` null so the
+    // generic saveModal() can never report a false "Changes saved" success
+    // and the header does not read "Edit add-money".
+    this.editing = type === "add-money" ? null : item || null;
+    this.contributionError = null;
+    this.contributionTarget = type === "add-money" ? item || null : null;
+    this.contributionAmount = "";
     this.form = {
       description:
         item?.description || item?.goalName || item?.accountName || "",
@@ -535,6 +544,101 @@ export class BudgetService {
   closeModal() {
     this.modal.set(null);
     this.editing = null;
+    this.contributionTarget = null;
+    this.contributionAmount = "";
+    this.contributionError = null;
+  }
+
+  /** Add Money: contribution = validated amount, new saved = current saved + contribution.
+   *  Persists via PUT /api/savingsgoals/{id} with the full goal payload.
+   *  Backend rejects savedAmount > targetAmount, and progress = saved/target*100. */
+
+  async saveContribution() {
+    if (this.saving()) return;
+    const goal = this.contributionTarget;
+    const raw = String(this.contributionAmount ?? "").trim();
+    const amount = Number(raw);
+    // Reject empty, non-numeric, zero, negative.
+    if (!goal || raw === "" || !Number.isFinite(amount) || amount <= 0) {
+      this.contributionError = "Please enter an amount greater than 0.";
+      return;
+    }
+    // Resolve the id defensively (store uses goalId; API payloads may vary in casing).
+    const goalId =
+      goal.goalId ?? goal.savingsGoalId ?? goal.SavingsGoalId ?? goal.GoalId ?? goal.id;
+    if (!goalId) {
+      this.contributionError = "Could not identify this goal. Please reopen the popup.";
+      return;
+    }
+    // Re-read the freshest saved/target values from the store so a stale
+    // popup snapshot can never overwrite a newer persisted value.
+    const fresh =
+      this.store().goals.find((g: any) => (g.goalId ?? g.savingsGoalId) === goalId) || goal;
+    const currentSaved = Number((fresh as any).savedAmount ?? (fresh as any).SavedAmount) || 0;
+    const target = Number((fresh as any).targetAmount ?? (fresh as any).TargetAmount) || 0;
+    const newSaved = Math.round((currentSaved + amount) * 100) / 100;
+    // Follow backend business rule: savedAmount must not exceed targetAmount.
+    if (target > 0 && newSaved > target) {
+      this.contributionError = `Contribution would exceed the goal. You can add up to ${this.money(target - currentSaved)} more.`;
+      return;
+    }
+    if (!this.connectionIsAvailable()) {
+      this.contributionError = "API is not connected. Start the backend and try again.";
+      return;
+    }
+    this.saving.set(true);
+    this.contributionError = null;
+    try {
+      const datePart = (fresh as any).targetDate
+        ? String((fresh as any).targetDate).substring(0, 10)
+        : null;
+      const updated: any = await this.api.put(
+        this.settings().apiBaseUrl,
+        `/api/savingsgoals/${goalId}`,
+        {
+          goalName: (fresh as any).goalName ?? goal.goalName,
+          targetAmount: target,
+          savedAmount: newSaved,
+          targetDate: datePart,
+        },
+      );
+      // Optimistically patch the goal in the store from the PUT response so
+      // the card (saved amount / remaining / progress bar) updates instantly,
+      // even if the follow-up full sync fails. Keys are read case-insensitively
+      // because the API may serialize PascalCase or camelCase.
+      const respSaved = Number(
+        updated?.savedAmount ?? updated?.SavedAmount ?? newSaved,
+      );
+      const respTarget = Number(
+        updated?.targetAmount ?? updated?.TargetAmount ?? target,
+      );
+      const current = this.store();
+      this.storage.updateStore({
+        ...current,
+        goals: current.goals.map((g: any) =>
+          (g.goalId ?? g.savingsGoalId) === goalId
+            ? { ...g, savedAmount: respSaved, targetAmount: respTarget }
+            : g,
+        ),
+      });
+      // Refresh from the backend so the UI reflects persisted values and
+      // survives a browser refresh. A sync failure must not mask a
+      // successful save because the optimistic patch above already applied it.
+      try {
+        await this.storage.syncFromApi();
+      } catch {
+        /* keep optimistic values; next page load re-syncs */
+      }
+      const goalName = (fresh as any).goalName ?? goal.goalName ?? "goal";
+      this.closeModal();
+      this.notify(`Added ${this.money(amount)} to "${goalName}"`);
+    } catch (error: any) {
+      // Keep the popup open so the user can retry; no success toast here.
+      this.contributionError =
+        error?.message || "Could not add money to this goal.";
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   private categoryId(name: string): number {
@@ -561,6 +665,13 @@ export class BudgetService {
     if (this.saving()) return;
 
     const type = this.modal();
+
+    // 'add-money' has its own saver. Never let the generic saver report
+    // success for it (it would show "Changes saved" without any PUT).
+    if (type === "add-money") {
+      await this.saveContribution();
+      return;
+    }
     const f = this.form;
     const amount = Number(f.amount);
     const baseUrl = this.settings().apiBaseUrl;

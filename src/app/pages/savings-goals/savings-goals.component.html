@@ -66,6 +66,12 @@
       <div class="mt-2 text-right text-[11px] amount-savings">
         {{ vm.money(g.targetAmount) }} goal
       </div>
+      <button
+        (click)="vm.openModal('add-money', g)"
+        class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+      >
+        <i-lucide name="plus" [size]="14"></i-lucide>Add money
+      </button>
     </section>
   </div>
 </section>

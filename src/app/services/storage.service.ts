@@ -191,12 +191,20 @@ export class StorageService {
         }));
 
       const mappedGoals: Goal[] = this.rows(goals).map((x: any) => ({
-        goalId: x.savingsGoalId ?? x.goalId,
-        userId: x.userId,
-        goalName: x.goalName,
-        targetAmount: Number(x.targetAmount),
-        savedAmount: Number(x.savedAmount),
-        targetDate: x.targetDate ? this.date(x.targetDate) : "",
+        goalId:
+          x.savingsGoalId ??
+          x.SavingsGoalId ??
+          x.goalId ??
+          x.GoalId ??
+          x.id ??
+          x.Id,
+        userId: x.userId ?? x.UserId,
+        goalName: x.goalName ?? x.GoalName,
+        targetAmount: Number(x.targetAmount ?? x.TargetAmount),
+        savedAmount: Number(x.savedAmount ?? x.SavedAmount),
+        targetDate: (x.targetDate ?? x.TargetDate)
+          ? this.date(x.targetDate ?? x.TargetDate)
+          : "",
       }));
 
       const mappedAccounts: Account[] = accountRows.map((x: any) => ({
