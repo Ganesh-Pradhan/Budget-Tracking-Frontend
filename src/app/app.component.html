@@ -802,6 +802,7 @@
         Payment mode
 
         <app-custom-select
+          required
           [(ngModel)]="vm.form.paymentModeId"
           name="paymentModeId"
           [options]="vm.apiPaymentModes"

@@ -677,8 +677,7 @@ export class BudgetService {
             ? item?.bankName || ""
             : item?.frequency || "Monthly",
       accountId: item?.accountId || this.accounts[0]?.accountId || "",
-      paymentModeId:
-        item?.paymentModeId || this.storage.paymentModeOptions()[0]?.id || "",
+      paymentModeId: item?.paymentModeId ?? "",
       sourceId:
         item?.sourceId || this.storage.incomeSourceOptions()[0]?.id || "",
     };
@@ -842,10 +841,7 @@ export class BudgetService {
     try {
       const userId = this.storage.currentUserId;
       const accountId = Number(f.accountId) || this.accounts[0]?.accountId;
-      const paymentModeId =
-        Number(f.paymentModeId) ||
-        this.storage.paymentModeOptions()[0]?.id ||
-        1;
+      const paymentModeId = Number(f.paymentModeId);
       const categoryId = this.categoryId(f.category);
       if (
         (type === "transaction" || type === "expense" || type === "bill") &&
