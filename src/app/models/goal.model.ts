@@ -4,5 +4,5 @@ export interface Goal {
   goalName: string;
   targetAmount: number;
   savedAmount: number;
-  targetDate: string;
+  targetDate: string | null;
 }

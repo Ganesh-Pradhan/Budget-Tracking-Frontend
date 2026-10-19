@@ -208,11 +208,16 @@ export class BudgetService {
     }).format(v || 0);
   }
 
-  dateLabel(v: string) {
+  dateLabel(v: string | null | undefined) {
+    if (v == null) return "No target date";
+    const text = String(v).trim();
+    if (!text) return "No target date";
+    const parsed = new Date(`${text}T12:00:00`);
+    if (isNaN(parsed.getTime())) return "No target date";
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
-    }).format(new Date(`${v}T12:00:00`));
+    }).format(parsed);
   }
 
   monthLabel(v: string) {

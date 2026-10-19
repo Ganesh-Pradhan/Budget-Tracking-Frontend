@@ -47,7 +47,7 @@
       </div>
       <h2 class="mt-7 font-display text-xl">{{ g.goalName }}</h2>
       <div class="mt-1 text-xs text-muted-foreground">
-        Target {{ vm.dateLabel(g.targetDate) }}
+        {{ g.targetDate ? "Target " + vm.dateLabel(g.targetDate) : "No target date" }}
       </div>
       <div class="mt-7 flex justify-between text-xs">
         <span class="amount-savings">{{ vm.money(g.savedAmount) }} saved</span
