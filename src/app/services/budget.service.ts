@@ -463,8 +463,56 @@ export class BudgetService {
   totalExpenses() {
     return this.store().expenses.reduce((sum, e) => sum + e.amount, 0);
   }
+  /**
+   * Monthly-recurring-equivalent helper.
+   * Converts a bill's full amount into a per-month equivalent based on its
+   * billing frequency, so that a yearly/quarterly/weekly bill contributes a
+   * value that is comparable to a monthly one.
+   *
+   * Normalization rules (only for frequencies this app actually supports):
+   *   - Weekly:     amount / 52 weeks * 12 months
+   *   - Monthly:    amount
+   *   - Quarterly:  amount / 4 quarters
+   *   - Yearly:     amount / 12 months
+   *
+   * Bills with any other frequency (including `BiWeekly`, which is not a
+   * monthly-equivalent-safe value) or with missing/invalid amounts are
+   * excluded from the monthly-recurring total. They are never silently
+   * treated as monthly.
+   */
+  private toMonthlyRecurringEquivalent(amount: number, frequency: string): number {
+    if (!Number.isFinite(amount) || amount <= 0) return NaN;
+    const f = (frequency || "").trim().toLowerCase();
+    switch (f) {
+      case "weekly":
+        return amount * 52 / 12;
+      case "monthly":
+        return amount;
+      case "quarterly":
+        return amount * 4 / 12;
+      case "yearly":
+        return amount / 12;
+      default:
+        return NaN;
+    }
+  }
+
   totalBills() {
-    return this.store().bills.reduce((sum, b) => sum + b.amount, 0);
+    // Monthly-recurring expenses only: active bills with a computable
+    // frequency-based monthly equivalent. Inactive bills and unknown
+    // frequencies are excluded.
+    return this.store()
+      .bills.filter(
+        (b) =>
+          b.isActive &&
+          Number.isFinite(Number(b.amount)) &&
+          Number(b.amount) > 0 &&
+          this.toMonthlyRecurringEquivalent(Number(b.amount), b.frequency) >= 0,
+      )
+      .reduce(
+        (sum, b) => sum + this.toMonthlyRecurringEquivalent(Number(b.amount), b.frequency),
+        0,
+      );
   }
 
   get sortedBills() {
