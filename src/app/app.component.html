@@ -617,7 +617,9 @@
     {{
       vm.modal() === "goal"
         ? "Target amount"
-        : "Amount"
+        : vm.modal() === "account"
+          ? "Balance"
+          : "Amount"
     }}
 
     <input
@@ -707,6 +709,34 @@
       step="0.01"
       [(ngModel)]="vm.form.savedAmount"
       name="goal-saved-amount"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+    />
+  </label>
+
+  <!-- ACCOUNT TYPE (ACCOUNT) -->
+  <label
+    *ngIf="vm.modal() === 'account'"
+    class="block text-xs font-semibold"
+  >
+    Account type
+    <app-custom-select
+      [(ngModel)]="vm.form.accountType"
+      name="account-type"
+      [options]="['Checking', 'Savings', 'Cash', 'Credit Card', 'Investment', 'Other']"
+      class="mt-2 w-full"
+    ></app-custom-select>
+  </label>
+
+  <!-- ACCOUNT NUMBER (ACCOUNT) -->
+  <label
+    *ngIf="vm.modal() === 'account'"
+    class="block text-xs font-semibold"
+  >
+    Account number
+    <input
+      type="text"
+      [(ngModel)]="vm.form.accountNumber"
+      name="account-number"
       class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
     />
   </label>

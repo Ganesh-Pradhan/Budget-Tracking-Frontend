@@ -208,14 +208,14 @@ export class StorageService {
       }));
 
       const mappedAccounts: Account[] = accountRows.map((x: any) => ({
-        accountId: x.accountId,
-        userId: x.userId,
-        accountType: x.accountType,
-        accountName: x.accountName,
-        bankName: x.bankName || "",
-        accountNumber: x.accountNumber || "",
-        balance: Number(x.balance),
-        isActive: !!x.isActive,
+        accountId: x.accountId ?? x.AccountId,
+        userId: x.userId ?? x.UserId,
+        accountType: x.accountType ?? x.AccountType,
+        accountName: x.accountName ?? x.AccountName,
+        bankName: (x.bankName ?? x.BankName) || "",
+        accountNumber: (x.accountNumber ?? x.AccountNumber) || "",
+        balance: Number(x.balance ?? x.Balance),
+        isActive: (x.isActive ?? x.IsActive) ?? true,
       }));
 
       const mappedBills: Bill[] = this.rows(bills).map((x: any) => ({

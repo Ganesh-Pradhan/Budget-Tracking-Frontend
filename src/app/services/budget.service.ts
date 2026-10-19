@@ -525,6 +525,8 @@ export class BudgetService {
           : item?.nextOccurrenceDate ||
             new Date().toISOString().slice(0, 10),
       savedAmount: type === "goal" ? item?.savedAmount ?? 0 : "",
+      accountType: item?.accountType || "Checking",
+      accountNumber: item?.accountNumber || "",
       category: item?.category || this.categories[0] || "",
       type: item?.transactionType || "Expense",
       extra:
@@ -792,11 +794,25 @@ export class BudgetService {
       }
 
       if (type === "goal") {
+        // Editing a goal must never wipe contributions: always carry the
+        // existing savedAmount forward unless the edit form explicitly changed it.
+        const editingSaved = Number(this.editing?.savedAmount);
+        const formSaved = (f.savedAmount === "" || f.savedAmount == null)
+          ? NaN
+          : Number(f.savedAmount);
+        const savedAmount = Number.isFinite(formSaved)
+          ? formSaved
+          : (Number.isFinite(editingSaved) ? editingSaved : 0);
+        if (Number.isFinite(savedAmount) && Number.isFinite(amount) && savedAmount > amount) {
+          throw new Error(
+            `Target amount cannot be less than the already saved ${this.money(savedAmount)}.`,
+          );
+        }
         const payload = {
           userId,
           goalName: f.description,
           targetAmount: amount,
-          savedAmount: Number(f.savedAmount) || (this.editing?.savedAmount || 0),
+          savedAmount,
           targetDate: f.targetDate || null,
         };
         if (this.editing)
@@ -806,7 +822,7 @@ export class BudgetService {
             {
               goalName: f.description,
               targetAmount: amount,
-              savedAmount: Number(f.savedAmount) || (this.editing.savedAmount || 0),
+              savedAmount,
               targetDate: f.targetDate || null,
             },
           );
@@ -814,14 +830,17 @@ export class BudgetService {
       }
 
       if (type === "account") {
+        // Editing must preserve balance/isActive: balance comes from the form
+        // amount field (pre-filled with the current balance), isActive is
+        // carried forward so an edit cannot silently deactivate/reactivate.
         const payload = {
           userId,
-          accountType: this.editing?.accountType || "Checking",
+          accountType: f.accountType || this.editing?.accountType || "Checking",
           accountName: f.description,
           bankName: f.extra || null,
-          accountNumber: this.editing?.accountNumber || null,
+          accountNumber: (f.accountNumber ?? this.editing?.accountNumber ?? null) || null,
           balance: amount,
-          isActive: true,
+          isActive: this.editing?.isActive ?? true,
         };
         if (this.editing)
           await this.api.put(
