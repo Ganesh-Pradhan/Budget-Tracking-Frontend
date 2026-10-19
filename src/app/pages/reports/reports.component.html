@@ -23,7 +23,7 @@
   >
     <button
       *ngFor="let p of reportPeriods"
-      (click)="vm.reportPeriod = p"
+      (click)="vm.setReportPeriod(p)"
       class="rounded-lg px-3 py-2 text-xs font-semibold"
       [ngClass]="
         vm.reportPeriod === p
@@ -42,7 +42,7 @@
         <div>
           <h2 class="font-display text-xl">{{ vm.reportPeriod }} spending</h2>
           <p class="mt-1 text-xs text-muted-foreground">
-            A directional view of the last six months
+            {{ vm.reportSubtitle }}
           </p>
         </div>
         <i-lucide
@@ -51,24 +51,69 @@
           [size]="19"
         ></i-lucide>
       </div>
-      <div class="mt-8 flex h-[220px] items-end gap-3">
+      <div
+        *ngIf="vm.reportPeriod !== 'Categories'"
+        class="mt-4 flex items-center gap-4 text-[11px] text-muted-foreground"
+      >
+        <span class="flex items-center gap-1.5"
+          ><span class="size-2 rounded-full bg-primary"></span>Income</span
+        >
+        <span class="flex items-center gap-1.5"
+          ><span class="size-2 rounded-full bg-destructive"></span>Expense</span
+        >
+      </div>
+      <div
+        *ngIf="vm.reportChartItems.length; else noReportData"
+        class="mt-8 flex h-[220px] items-end gap-3"
+      >
         <div
-          *ngFor="let item of vm.reportMonths(); let i = index"
-          class="group flex flex-1 flex-col items-center gap-2"
+          *ngFor="let item of vm.reportChartItems"
+          class="group flex h-full flex-1 flex-col items-center gap-2"
         >
           <div
-            class="w-full rounded-t-lg bg-primary/65 transition-all group-hover:bg-primary"
-            [style.height.%]="
-              vm.reportMonths().length
-                ? (item.amount / (vm.reportMax || 1)) * 100
-                : 0
+            class="flex w-full flex-1 items-end justify-center gap-1"
+            [title]="
+              vm.reportPeriod === 'Categories'
+                ? item.label + ': ' + vm.money(item.expense)
+                : item.label +
+                  ' · Income ' +
+                  vm.money(item.income) +
+                  ' · Expense ' +
+                  vm.money(item.expense)
             "
-          ></div>
-          <span class="text-[10px] text-muted-foreground">{{
+          >
+            <div
+              *ngIf="vm.reportPeriod !== 'Categories'"
+              class="w-full max-w-6 rounded-t-lg bg-primary/65 transition-all group-hover:bg-primary"
+              [style.height.%]="
+                item.income > 0 ? (item.income / (vm.reportChartMax || 1)) * 100 : 0
+              "
+            ></div>
+            <div
+              class="w-full rounded-t-lg transition-all"
+              [ngClass]="
+                vm.reportPeriod === 'Categories'
+                  ? 'bg-primary/65 group-hover:bg-primary'
+                  : 'max-w-6 bg-destructive/60 group-hover:bg-destructive'
+              "
+              [style.height.%]="
+                item.expense > 0 ? (item.expense / (vm.reportChartMax || 1)) * 100 : 0
+              "
+            ></div>
+          </div>
+          <span
+            class="max-w-full truncate text-[10px] text-muted-foreground"
+            [title]="item.label"
+            >{{
             item.label
           }}</span>
         </div>
       </div>
+      <ng-template #noReportData>
+        <p class="mt-8 rounded-xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
+          No records found for this view yet.
+        </p>
+      </ng-template>
     </section>
     <section
       class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"

@@ -294,6 +294,94 @@ export class BudgetService {
     return Math.max(...this.reportMonths().map((x) => x.amount), 1);
   }
 
+  setReportPeriod(period: string) {
+    this.reportPeriod = period;
+  }
+
+  /** Selected reporting year, derived from the app's existing month filter. */
+  get reportYear(): number {
+    const y = Number((this.month() || '').slice(0, 4));
+    return Number.isFinite(y) && y > 0 ? y : this.currentYear;
+  }
+
+  /** Distinct years present in synced incomes/expenses (sorted ascending). */
+  get reportYears(): number[] {
+    const years = new Set<number>();
+    for (const e of this.store().expenses || []) {
+      const y = Number((e.expenseDate || '').slice(0, 4));
+      if (Number.isFinite(y) && y > 0) years.add(y);
+    }
+    for (const i of this.store().incomes || []) {
+      const y = Number((i.incomeDate || '').slice(0, 4));
+      if (Number.isFinite(y) && y > 0) years.add(y);
+    }
+    if (years.size === 0) years.add(this.reportYear);
+    return [...years].sort((a, b) => a - b);
+  }
+
+  /** Monthly income + expense totals for the selected reporting year. */
+  get monthlyIncomeExpense(): { label: string; income: number; expense: number; amount: number }[] {
+    const year = this.reportYear;
+    return Array.from({ length: 12 }, (_, m) => {
+      const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+      const income = (this.store().incomes || [])
+        .filter((i) => (i.incomeDate || '').startsWith(key))
+        .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+      const expense = (this.store().expenses || [])
+        .filter((e) => (e.expenseDate || '').startsWith(key))
+        .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+      const label = new Date(year, m, 1).toLocaleString('en-US', { month: 'short' });
+      return { label, income, expense, amount: expense };
+    });
+  }
+
+  /** Yearly income + expense totals grouped by actual calendar year. */
+  get yearlyIncomeExpense(): { label: string; income: number; expense: number; amount: number }[] {
+    return this.reportYears.map((year) => {
+      const prefix = `${year}-`;
+      const income = (this.store().incomes || [])
+        .filter((i) => (i.incomeDate || '').startsWith(prefix))
+        .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+      const expense = (this.store().expenses || [])
+        .filter((e) => (e.expenseDate || '').startsWith(prefix))
+        .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+      return { label: String(year), income, expense, amount: expense };
+    });
+  }
+
+  /** Expense totals grouped by category for the selected reporting year.
+   *  Only expenses are included, so income sources never leak in. */
+  get categoryExpenseTotals(): { label: string; income: number; expense: number; amount: number }[] {
+    const prefix = `${this.reportYear}-`;
+    const totals = new Map<string, number>();
+    for (const e of this.store().expenses || []) {
+      if (!(e.expenseDate || '').startsWith(prefix)) continue;
+      const name = (e.category || '').trim() || 'Uncategorized';
+      totals.set(name, (totals.get(name) || 0) + (Number(e.amount) || 0));
+    }
+    return [...totals.entries()]
+      .map(([label, expense]) => ({ label, income: 0, expense, amount: expense }))
+      .filter((x) => x.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+  }
+
+  /** Chart rows for the currently selected report tab. */
+  get reportChartItems(): { label: string; income: number; expense: number; amount: number }[] {
+    if (this.reportPeriod === 'Yearly') return this.yearlyIncomeExpense;
+    if (this.reportPeriod === 'Categories') return this.categoryExpenseTotals;
+    return this.monthlyIncomeExpense;
+  }
+
+  get reportChartMax(): number {
+    return Math.max(...this.reportChartItems.map((x) => Math.max(x.income, x.expense, x.amount)), 1);
+  }
+
+  get reportSubtitle(): string {
+    if (this.reportPeriod === 'Yearly') return 'Income vs expenses by calendar year';
+    if (this.reportPeriod === 'Categories') return `Expense breakdown by category · ${this.reportYear}`;
+    return `Income vs expenses by month · ${this.reportYear}`;
+  }
+
   get monthTransactions() {
     return this.store().transactions.filter((t) =>
       t.transactionDate.startsWith(this.month()),
