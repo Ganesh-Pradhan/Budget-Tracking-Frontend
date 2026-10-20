@@ -47,11 +47,13 @@
         </p>
       </div>
       <div class="hidden grid grid-cols-[1fr_1fr_80px_40px_40px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
-        <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors" title="Sort by date">
+        <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors"
+          [appTooltip]="vm.sortColumn() === 'date' && vm.sortDirection() === 'asc' ? 'Sort by date (ascending)' : vm.sortColumn() === 'date' ? 'Sort by date (descending)' : 'Sort by date'">
           <span>Date</span>
           <i-lucide [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
         </button>
-        <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors" title="Sort by amount">
+        <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors"
+          [appTooltip]="vm.sortColumn() === 'amount' && vm.sortDirection() === 'asc' ? 'Sort by amount (ascending)' : vm.sortColumn() === 'amount' ? 'Sort by amount (descending)' : 'Sort by amount'">
           <span>Amount</span>
           <i-lucide [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
         </button>
@@ -75,12 +77,16 @@
         <div class="font-semibold amount-expense">{{ vm.money(b.amount) }}</div>
         <button
           (click)="vm.openModal('bill', b)"
-          class="rounded-lg p-2 text-muted-foreground"
+          class="icon-btn icon-btn--primary"
+          aria-label="Edit bill"
+          appTooltip="Edit bill"
         >
           <i-lucide name="pencil" [size]="14"></i-lucide></button
         ><button
           (click)="vm.deleteItem('bills', b.recurringTransactionId)"
-          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+          class="icon-btn icon-btn--danger"
+          aria-label="Delete bill"
+          appTooltip="Delete bill"
         >
           <i-lucide name="trash-2" [size]="14"></i-lucide>
         </button>

@@ -16,7 +16,7 @@
           vm.changeMonth(
             vm.months[Math.max(0, vm.months.indexOf(vm.month()) - 1)]
           )
-        " class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted">
+        " class="icon-btn" aria-label="Previous month" appTooltip="Previous month">
         <i-lucide name="chevron-left" [size]="15"></i-lucide></button><app-custom-select
         [value]="vm.month()"
         (valueChange)="vm.changeMonth($event)"
@@ -31,9 +31,10 @@
             ]
           )
         " [disabled]="vm.isCurrentMonthOrLater(vm.month())"
-        class="rounded-lg px-2 py-1.5 text-muted-foreground hover:bg-muted"
-        [class.opacity-50]="vm.isCurrentMonthOrLater(vm.month())"
-        [class.cursor-not-allowed]="vm.isCurrentMonthOrLater(vm.month())">
+        class="icon-btn"
+        [disabled]="vm.isCurrentMonthOrLater(vm.month())"
+        aria-label="Next month"
+        appTooltip="Next month">
         <i-lucide name="chevron-right" [size]="15"></i-lucide>
       </button>
     </div>
@@ -73,7 +74,9 @@
             Your spending rhythm this month
           </p>
         </div>
-        <button class="rounded-lg p-2 text-muted-foreground hover:bg-muted">
+        <button class="icon-btn"
+          aria-label="More options"
+          appTooltip="More options">
           <i-lucide name="ellipsis" [size]="18"></i-lucide>
         </button>
       </div>
@@ -208,7 +211,9 @@
           }}{{ vm.money(item.amount) }}
         </div>
         <button (click)="vm.deleteTransaction(item)"
-          class="rounded-lg p-2 text-muted-foreground hover:text-destructive">
+          class="icon-btn icon-btn--danger"
+          aria-label="Delete transaction"
+          appTooltip="Delete transaction">
           <i-lucide name="trash-2" [size]="14"></i-lucide>
         </button>
       </div>

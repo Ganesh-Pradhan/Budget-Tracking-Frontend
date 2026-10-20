@@ -5,11 +5,12 @@ import { LucideAngularModule } from 'lucide-angular';
 import { BudgetService } from '../../services/budget.service';
 import { AuthService } from '../../services/auth.service';
 import { CustomSelectComponent } from '../../components/ui/custom-select/custom-select.component';
+import { TooltipDirective } from '../../components/ui/tooltip/tooltip.directive';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, CustomSelectComponent, TooltipDirective],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

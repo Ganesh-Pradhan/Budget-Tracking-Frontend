@@ -290,3 +290,169 @@
 .dark .amount-neutral {
   color: hsl(var(--muted-foreground));
 }
+
+/* ---------------------------------------------------------------------------
+   Shared icon-button interaction system
+   One consistent pattern for every icon-only control across the app:
+   soft background on hover, gentle lift, visible keyboard focus ring,
+   restrained press state. All motion respects prefers-reduced-motion.
+   --------------------------------------------------------------------------- */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.625rem;
+  color: hsl(var(--muted-foreground));
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.icon-btn:hover {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  transform: translateY(-1px) scale(1.04);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+  transition-duration: 0.08s;
+}
+
+.icon-btn:focus-visible {
+  outline: none;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring) / 0.45);
+}
+
+.icon-btn:disabled,
+.icon-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tint variants — used for edit / delete affordances. */
+.icon-btn--primary:hover {
+  background-color: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+}
+
+.icon-btn--danger:hover {
+  background-color: hsl(var(--destructive) / 0.12);
+  color: hsl(var(--destructive));
+}
+
+/* Circular variant — profile avatar. */
+.icon-btn--round {
+  border-radius: 9999px;
+}
+
+/* Sidebar variant — sits on the dark navigation surface. */
+.icon-btn--sidebar {
+  color: hsl(var(--sidebar-foreground) / 0.7);
+}
+
+.icon-btn--sidebar:hover {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-foreground));
+}
+
+.icon-btn--sidebar:focus-visible {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-foreground));
+  box-shadow:
+    0 0 0 2px hsl(var(--sidebar)),
+    0 0 0 4px hsl(var(--sidebar-primary) / 0.5);
+}
+
+/* Avatar — filled with the secondary surface, same interaction language. */
+.icon-btn--avatar {
+  border-radius: 9999px;
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.icon-btn--avatar:hover {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+}
+
+.icon-btn--avatar:focus-visible {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.icon-btn--avatar[aria-expanded="true"] {
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+   Lightweight tooltip (used by the [appTooltip] directive)
+   Appended to <body> with position:fixed so sticky headers can't clip it.
+   --------------------------------------------------------------------------- */
+.app-tooltip {
+  position: fixed;
+  z-index: 100;
+  max-width: 220px;
+  padding: 0.35rem 0.625rem;
+  border-radius: 0.5rem;
+  background-color: hsl(var(--foreground) / 0.94);
+  color: hsl(var(--background));
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow:
+    0 1px 2px hsl(221 28% 18% / 0.08),
+    0 6px 16px hsl(221 28% 18% / 0.16);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* Shown below the anchor (flipped) — slide in from the opposite side. */
+.app-tooltip--below {
+  transform: translateY(-4px);
+}
+
+.app-tooltip--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-tooltip {
+    transition: opacity 0.01s linear;
+  }
+
+  .app-tooltip,
+  .app-tooltip--below {
+    transform: none;
+  }
+
+  .icon-btn {
+    transition:
+      background-color 0.01s linear,
+      color 0.01s linear;
+  }
+
+  .icon-btn:hover,
+  .icon-btn:active {
+    transform: none;
+  }
+}

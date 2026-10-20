@@ -32,14 +32,17 @@
         <div class="flex items-center gap-1">
           <button
             (click)="vm.openModal('goal', g)"
-            class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-            title="Edit goal"
+            class="icon-btn icon-btn--primary"
+            aria-label="Edit goal"
+            appTooltip="Edit goal"
           >
             <i-lucide name="pencil" [size]="14"></i-lucide>
           </button>
           <button
             (click)="vm.deleteItem('goals', g.goalId)"
-            class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+            class="icon-btn icon-btn--danger"
+            aria-label="Delete goal"
+            appTooltip="Delete goal"
           >
             <i-lucide name="trash-2" [size]="14"></i-lucide>
           </button>

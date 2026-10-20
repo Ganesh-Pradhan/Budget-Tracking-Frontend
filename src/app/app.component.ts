@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, HostListener, OnInit, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterOutlet } from "@angular/router";
 import { LucideAngularModule } from "lucide-angular";
@@ -8,6 +8,7 @@ import { ConfirmService } from "./services/confirm.service";
 import { AuthService } from "./services/auth.service";
 import { NavItem } from "./models";
 import { CustomSelectComponent } from "./components/ui/custom-select/custom-select.component";
+import { TooltipDirective } from "./components/ui/tooltip/tooltip.directive";
 
 @Component({
   selector: "app-root",
@@ -18,8 +19,10 @@ import { CustomSelectComponent } from "./components/ui/custom-select/custom-sele
     LucideAngularModule,
     RouterOutlet,
     CustomSelectComponent,
+    TooltipDirective,
   ],
   templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
   Math = Math;
@@ -53,6 +56,12 @@ export class AppComponent implements OnInit {
   // Profile dropdown (sidebar footer / topbar avatar)
   profileDropdown = signal(false);
 
+  /** True while the dropdown plays its closing animation. */
+  dropdownClosing = signal(false);
+
+  /** Briefly true after a theme switch to play the icon-swap animation. */
+  themeAnimating = false;
+
   constructor(private route: ActivatedRoute) {}
 
   async ngOnInit() {
@@ -68,7 +77,52 @@ export class AppComponent implements OnInit {
   }
 
   closeDropdownOnBackdrop(): void {
-    this.profileDropdown.set(false);
+    this.closeProfileDropdown();
+  }
+
+  toggleProfileDropdown(): void {
+    if (this.profileDropdown() && !this.dropdownClosing()) {
+      this.closeProfileDropdown();
+    } else {
+      this.openProfileDropdown();
+    }
+  }
+
+  openProfileDropdown(): void {
+    this.dropdownClosing.set(false);
+    this.profileDropdown.set(true);
+  }
+
+  closeProfileDropdown(): void {
+    if (!this.profileDropdown() || this.dropdownClosing()) {
+      return;
+    }
+
+    this.dropdownClosing.set(true);
+    setTimeout(() => {
+      this.profileDropdown.set(false);
+      this.dropdownClosing.set(false);
+    }, 140);
+  }
+
+  /** Theme toggle — same persistence as before, plus a subtle icon swap. */
+  toggleTheme(): void {
+    const next = this.vm.settings().theme === "light" ? "dark" : "light";
+    this.vm.updateSetting({ theme: next });
+    this.playThemeSwap();
+  }
+
+  @HostListener("document:keydown.escape")
+  onDocumentEscape(): void {
+    this.closeProfileDropdown();
+  }
+
+  private playThemeSwap(): void {
+    this.themeAnimating = false;
+    setTimeout(() => {
+      this.themeAnimating = true;
+      setTimeout(() => (this.themeAnimating = false), 400);
+    });
   }
 
   /** Displayed name of the signed-in user (from the server session). */

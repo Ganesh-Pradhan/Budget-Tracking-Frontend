@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
 import { BudgetService } from "../../services/budget.service";
 import { CustomSelectComponent } from "../../components/ui/custom-select/custom-select.component";
+import { TooltipDirective } from "../../components/ui/tooltip/tooltip.directive";
 
 interface SummaryCard {
   l: string;
@@ -16,7 +17,7 @@ interface SummaryCard {
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, CustomSelectComponent, TooltipDirective],
   templateUrl: "./dashboard.component.html",
   styleUrl: "./dashboard.component.css",
 })

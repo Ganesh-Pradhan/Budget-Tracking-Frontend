@@ -68,11 +68,13 @@
       <h2 class="font-display text-xl">Expense history</h2>
     </div>
     <div class="hidden grid grid-cols-[1fr_1fr_80px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
-      <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors" title="Sort by date">
+      <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors"
+        [appTooltip]="vm.sortColumn() === 'date' && vm.sortDirection() === 'asc' ? 'Sort by date (ascending)' : vm.sortColumn() === 'date' ? 'Sort by date (descending)' : 'Sort by date'">
         <span>Date</span>
         <i-lucide [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
       </button>
-      <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors" title="Sort by amount">
+      <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors"
+        [appTooltip]="vm.sortColumn() === 'amount' && vm.sortDirection() === 'asc' ? 'Sort by amount (ascending)' : vm.sortColumn() === 'amount' ? 'Sort by amount (descending)' : 'Sort by amount'">
         <span>Amount</span>
         <i-lucide [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
       </button>
@@ -92,15 +94,17 @@
         <div class="font-semibold amount-expense">-{{ vm.money(item.amount) }}</div>
         <button
           (click)="vm.openModal('expense', item)"
-          class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-          title="Edit expense"
+          class="icon-btn icon-btn--primary"
+          aria-label="Edit expense"
+          appTooltip="Edit expense"
         >
           <i-lucide name="pencil" [size]="14"></i-lucide>
         </button>
         <button
           (click)="vm.deleteExpense(item)"
-          class="rounded-lg p-2 text-muted-foreground hover:text-destructive"
-          title="Delete expense"
+          class="icon-btn icon-btn--danger"
+          aria-label="Delete expense"
+          appTooltip="Delete expense"
         >
           <i-lucide name="trash-2" [size]="14"></i-lucide>
         </button>

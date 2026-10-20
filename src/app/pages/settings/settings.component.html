@@ -157,7 +157,9 @@
         <button
           (click)="vm.testConnection()"
           [disabled]="vm.apiChecking"
-          class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50"
+          class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold transition-colors hover:border-primary/40 hover:bg-muted/60 disabled:opacity-50"
+          aria-label="Test the API connection"
+          appTooltip="Test the API connection"
         >
           <i-lucide
             [name]="vm.apiChecking ? 'refresh-cw' : 'zap'"

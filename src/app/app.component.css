@@ -1,0 +1,74 @@
+/* ---------------------------------------------------------------------------
+   Header icon buttons — the shared .icon-btn pattern lives in src/index.css
+   so every page uses the exact same interaction language.
+   --------------------------------------------------------------------------- */
+.header-icon-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+}
+
+.header-avatar-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Theme icon swap — subtle rotate + shrink while the icon crossfades. */
+@keyframes theme-swap {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: rotate(-60deg) scale(0.65);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.theme-swap svg {
+  animation: theme-swap 0.36s ease-in-out;
+}
+
+/* Profile dropdown open/close — gentle fade + scale. */
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+
+.profile-menu-enter {
+  animation: dropdown-in 0.16s ease-out both;
+}
+
+.profile-menu-exit {
+  animation: dropdown-out 0.12s ease-in both;
+}
+
+/* Respect reduced-motion: keep state changes, remove movement. */
+@media (prefers-reduced-motion: reduce) {
+  .theme-swap svg,
+  .profile-menu-enter,
+  .profile-menu-exit {
+    animation: none;
+  }
+}

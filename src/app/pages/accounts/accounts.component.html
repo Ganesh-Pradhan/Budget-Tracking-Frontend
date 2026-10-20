@@ -29,12 +29,15 @@
         </div>
         <div class="flex items-center gap-1">
           <button (click)="vm.openModal('account', a)"
-            class="rounded-lg p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-            title="Edit account">
+            class="icon-btn icon-btn--primary"
+            aria-label="Edit account"
+            appTooltip="Edit account">
             <i-lucide name="pencil" [size]="14"></i-lucide>
           </button>
           <button (click)="vm.deleteItem('accounts', a.accountId)"
-            class="rounded-lg p-2 text-muted-foreground hover:text-destructive">
+            class="icon-btn icon-btn--danger"
+            aria-label="Delete account"
+            appTooltip="Delete account">
             <i-lucide name="trash-2" [size]="14"></i-lucide>
           </button>
         </div>

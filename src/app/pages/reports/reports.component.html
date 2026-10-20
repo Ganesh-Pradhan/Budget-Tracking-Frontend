@@ -13,7 +13,9 @@
     </div>
     <button
       (click)="vm.exportReport()"
-      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-soft"
+      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-soft transition-colors hover:border-primary/40 hover:bg-muted/60"
+      aria-label="Export report as CSV"
+      appTooltip="Export report as CSV"
     >
       <i-lucide name="download" [size]="15"></i-lucide>Export
     </button>
