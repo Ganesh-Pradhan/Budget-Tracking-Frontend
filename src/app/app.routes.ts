@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard, signedInGuard } from './guards/auth.guard';
+import { LoginPageComponent } from './pages/login/login.component';
 import { DashboardPageComponent } from './pages/dashboard/dashboard.component';
 import { TransactionsPageComponent } from './pages/transactions/transactions.component';
 import { IncomePageComponent } from './pages/income/income.component';
@@ -14,16 +16,17 @@ import { NotFoundPageComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardPageComponent },
-  { path: 'transactions', component: TransactionsPageComponent },
-  { path: 'income', component: IncomePageComponent },
-  { path: 'expenses', component: ExpensesPageComponent },
-  { path: 'budget', component: BudgetPageComponent },
-  { path: 'yearly-summary', component: YearlySummaryPageComponent },
-  { path: 'savings-goals', component: SavingsGoalsPageComponent },
-  { path: 'accounts', component: AccountsPageComponent },
-  { path: 'bills', component: BillsPageComponent },
-  { path: 'reports', component: ReportsPageComponent },
-  { path: 'settings', component: SettingsPageComponent },
+  { path: 'login', component: LoginPageComponent, canActivate: [signedInGuard] },
+  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
+  { path: 'transactions', component: TransactionsPageComponent, canActivate: [authGuard] },
+  { path: 'income', component: IncomePageComponent, canActivate: [authGuard] },
+  { path: 'expenses', component: ExpensesPageComponent, canActivate: [authGuard] },
+  { path: 'budget', component: BudgetPageComponent, canActivate: [authGuard] },
+  { path: 'yearly-summary', component: YearlySummaryPageComponent, canActivate: [authGuard] },
+  { path: 'savings-goals', component: SavingsGoalsPageComponent, canActivate: [authGuard] },
+  { path: 'accounts', component: AccountsPageComponent, canActivate: [authGuard] },
+  { path: 'bills', component: BillsPageComponent, canActivate: [authGuard] },
+  { path: 'reports', component: ReportsPageComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsPageComponent, canActivate: [authGuard] },
   { path: '**', component: NotFoundPageComponent }
 ];

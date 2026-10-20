@@ -1,4 +1,4 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import {
   emptyStore,
   Settings,
@@ -11,6 +11,7 @@ import {
   Bill,
 } from "../models";
 import { ApiService } from "./api.service";
+import { AuthService } from "./auth.service";
 
 @Injectable({ providedIn: "root" })
 export class StorageService {
@@ -23,7 +24,7 @@ export class StorageService {
   readonly incomeSourceOptions = signal<{ id: number; name: string }[]>([]);
 
   private readonly settingsKey = "budget-tracker-settings-v1";
-  private readonly userId = 4;
+  private readonly auth = inject(AuthService);
 
   constructor(private api: ApiService) {}
 
@@ -33,10 +34,11 @@ export class StorageService {
 
   private loadSettings(): Settings {
     const defaults: Settings = {
-      name: "Ganesh",
+      name: "User",
       currency: "INR",
       notifications: true,
       theme: "light",
+      color: "default",
       apiBaseUrl: "http://localhost:5264",
     };
     try {
@@ -50,7 +52,7 @@ export class StorageService {
   }
 
   get currentUserId(): number {
-    return this.userId;
+    return this.auth.userId ?? 0;
   }
 
   updateStore(store: Store) {
@@ -85,15 +87,12 @@ export class StorageService {
         paymentModes,
         incomeSources,
       ] = await Promise.all([
-        this.getAllPages(baseUrl, `/api/transactions?userId=${this.userId}`),
-        this.getAllPages(baseUrl, `/api/incomes?userId=${this.userId}`),
-        this.getAllPages(baseUrl, `/api/expenses?userId=${this.userId}`),
-        this.getAllPages(baseUrl, `/api/savingsgoals?userId=${this.userId}`),
-        this.getAllPages(baseUrl, `/api/accounts?userId=${this.userId}`),
-        this.getAllPages(
-          baseUrl,
-          `/api/recurringtransactions?userId=${this.userId}`,
-        ),
+        this.getAllPages(baseUrl, `/api/transactions`),
+        this.getAllPages(baseUrl, `/api/incomes`),
+        this.getAllPages(baseUrl, `/api/expenses`),
+        this.getAllPages(baseUrl, `/api/savingsgoals`),
+        this.getAllPages(baseUrl, `/api/accounts`),
+        this.getAllPages(baseUrl, `/api/recurringtransactions`),
         this.getAllPages(baseUrl, `/api/categories`),
         this.getAllPages(baseUrl, `/api/paymentmodes`),
         this.getAllPages(baseUrl, `/api/incomesources`),
@@ -131,7 +130,6 @@ export class StorageService {
       );
 
       const mappedTransactions: Transaction[] = this.rows(transactions)
-        .filter((x: any) => x.userId === this.userId)
         .map((x: any) => ({
           transactionId: x.transactionId,
           userId: x.userId,
@@ -152,7 +150,6 @@ export class StorageService {
         }));
 
       const mappedIncomes: Income[] = this.rows(incomes)
-        .filter((x: any) => x.userId === this.userId)
         .map((x: any) => ({
           incomeId: x.incomeId,
           userId: x.userId,
@@ -169,7 +166,6 @@ export class StorageService {
         }));
 
       const mappedExpenses: Expense[] = this.rows(expenses)
-        .filter((x: any) => x.userId === this.userId)
         .map((x: any) => ({
           expenseId: x.expenseId,
           userId: x.userId,

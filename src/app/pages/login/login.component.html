@@ -1,0 +1,147 @@
+<section
+  class="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-10"
+>
+  <div class="w-full max-w-md animate-in">
+    <!-- BRAND -->
+    <div class="mb-8 text-center">
+      <div
+        class="mx-auto mb-4 grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground"
+      >
+        <i-lucide
+          name="sparkles"
+          [size]="22"
+        ></i-lucide>
+      </div>
+
+      <div class="font-display text-3xl tracking-tight">
+        Clearspace
+      </div>
+
+      <p class="mt-2 text-sm text-muted-foreground">
+        Money, made clear. Sign in to continue.
+      </p>
+    </div>
+
+    <!-- AUTH CARD -->
+    <form
+      (ngSubmit)="submit()"
+      class="rounded-2xl border border-card-border bg-card p-6 shadow-soft sm:p-7"
+      autocomplete="on"
+    >
+      <!-- MODE TOGGLE -->
+      <div
+        class="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1 text-xs font-semibold"
+      >
+        <button
+          type="button"
+          (click)="mode.set('login'); error.set('')"
+          [class.bg-card]="mode() === 'login'"
+          [class.shadow-soft]="mode() === 'login'"
+          class="rounded-lg px-3 py-2 transition-colors"
+        >
+          Sign in
+        </button>
+
+        <button
+          type="button"
+          (click)="mode.set('register'); error.set('')"
+          [class.bg-card]="mode() === 'register'"
+          [class.shadow-soft]="mode() === 'register'"
+          class="rounded-lg px-3 py-2 transition-colors"
+        >
+          Create account
+        </button>
+      </div>
+
+      <!-- FULL NAME (register only) -->
+      <label
+        *ngIf="mode() === 'register'"
+        class="block text-xs font-semibold"
+      >
+        Full name
+
+        <input
+          [(ngModel)]="fullName"
+          name="fullName"
+          type="text"
+          autocomplete="name"
+          placeholder="Your name"
+          class="mt-2 w-full rounded-xl border border-input bg-transparent px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+        />
+      </label>
+
+      <!-- EMAIL -->
+      <label class="mt-4 block text-xs font-semibold">
+        Email
+
+        <input
+          [(ngModel)]="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          class="mt-2 w-full rounded-xl border border-input bg-transparent px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+        />
+      </label>
+
+      <!-- PASSWORD -->
+      <label class="mt-4 block text-xs font-semibold">
+        Password
+
+        <input
+          [(ngModel)]="password"
+          name="password"
+          type="password"
+          [autocomplete]="mode() === 'login' ? 'current-password' : 'new-password'"
+          placeholder="••••••••"
+          class="mt-2 w-full rounded-xl border border-input bg-transparent px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+        />
+      </label>
+
+      <!-- CONFIRM PASSWORD (register only) -->
+      <label
+        *ngIf="mode() === 'register'"
+        class="mt-4 block text-xs font-semibold"
+      >
+        Confirm password
+
+        <input
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="••••••••"
+          class="mt-2 w-full rounded-xl border border-input bg-transparent px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+        />
+      </label>
+
+      <!-- ERROR -->
+      <div
+        *ngIf="error()"
+        class="mt-4 rounded-xl border border-destructive/20 bg-destructive/10 px-3.5 py-2.5 text-xs font-semibold text-destructive"
+      >
+        {{ error() }}
+      </div>
+
+      <!-- SUBMIT -->
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-xs font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{
+          loading()
+            ? "Please wait..."
+            : mode() === "login"
+              ? "Sign in"
+              : "Create account"
+        }}
+      </button>
+    </form>
+
+    <!-- API BASE URL HINT -->
+    <p class="mt-6 text-center text-[11px] text-muted-foreground">
+      API: {{ storage.settings().apiBaseUrl }}
+    </p>
+  </div>
+</section>

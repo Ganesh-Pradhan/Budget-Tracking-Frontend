@@ -1,7 +1,12 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { AuthService } from "./auth.service";
 
 @Injectable({ providedIn: "root" })
 export class ApiService {
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
   private clean(baseUrl: string): string {
     return baseUrl.replace(/\/$/, "");
   }
@@ -11,12 +16,18 @@ export class ApiService {
     path: string,
     options: RequestInit = {},
   ): Promise<T> {
+    const token = this.auth.token;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...((options.headers as Record<string, string>) || {}),
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${this.clean(baseUrl)}${path}`, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      },
+      headers,
     });
 
     const text = await response.text();
@@ -25,6 +36,13 @@ export class ApiService {
       body = text ? JSON.parse(text) : null;
     } catch {
       body = text;
+    }
+
+    if (response.status === 401 && token) {
+      // The JWT is missing, malformed or expired — end the local session so
+      // the auth guard can redirect to the login page on the next navigation.
+      this.auth.logout();
+      this.router.navigate(["/login"]);
     }
 
     if (!response.ok) {
@@ -41,12 +59,10 @@ export class ApiService {
   async testConnection(baseUrl: string): Promise<boolean> {
     if (!baseUrl) return false;
     try {
-      const response = await fetch(
-        `${this.clean(baseUrl)}/api/dashboard/summary?userId=4`,
-        {
-          signal: AbortSignal.timeout(2500),
-        },
-      );
+      // Anonymous liveness probe — deliberately not a data endpoint.
+      const response = await fetch(`${this.clean(baseUrl)}/api/health`, {
+        signal: AbortSignal.timeout(2500),
+      });
       return response.ok;
     } catch {
       return false;

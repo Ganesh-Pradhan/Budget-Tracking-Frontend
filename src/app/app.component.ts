@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterOutlet } from "@angular/router";
 import { LucideAngularModule } from "lucide-angular";
 import { BudgetService } from "./services/budget.service";
 import { ConfirmService } from "./services/confirm.service";
+import { AuthService } from "./services/auth.service";
 import { NavItem } from "./models";
 import { CustomSelectComponent } from "./components/ui/custom-select/custom-select.component";
 
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
 
   vm = inject(BudgetService);
   confirm = inject(ConfirmService);
+  private auth = inject(AuthService);
 
   overviewItems: NavItem[] = [
     { p: "dashboard", l: "Dashboard", i: "house" },
@@ -48,6 +50,9 @@ export class AppComponent implements OnInit {
   // Sidebar collapse state
   sidebarCollapsed = signal(false);
 
+  // Profile dropdown (sidebar footer / topbar avatar)
+  profileDropdown = signal(false);
+
   constructor(private route: ActivatedRoute) {}
 
   async ngOnInit() {
@@ -60,6 +65,24 @@ export class AppComponent implements OnInit {
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update((value) => !value);
+  }
+
+  closeDropdownOnBackdrop(): void {
+    this.profileDropdown.set(false);
+  }
+
+  /** Displayed name of the signed-in user (from the server session). */
+  get userName(): string {
+    return (
+      this.auth.user()?.fullName?.trim() ||
+      this.vm.settings().name?.trim() ||
+      "User"
+    );
+  }
+
+  /** Email of the signed-in user, or empty when signed out. */
+  get userEmail(): string {
+    return this.auth.user()?.email ?? "";
   }
 
   getInitials(name?: string): string {

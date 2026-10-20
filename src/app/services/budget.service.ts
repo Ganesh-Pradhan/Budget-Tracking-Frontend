@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { ApiService } from "./api.service";
+import { AuthService } from "./auth.service";
 import { StorageService } from "./storage.service";
 import { ConfirmService } from "./confirm.service";
 import { Transaction } from "../models";
@@ -63,6 +64,7 @@ export class BudgetService {
     private router: Router,
     private api: ApiService,
     private confirm: ConfirmService,
+    private auth: AuthService,
   ) {
     this.store = this.storage.store;
     this.settings = this.storage.settings;
@@ -75,6 +77,16 @@ export class BudgetService {
       "dark",
       this.settings().theme === "dark",
     );
+    if (!this.auth.isAuthenticated) return;
+    await this.refreshFromApi();
+  }
+
+  /**
+   * Loads (or reloads) data after the user signs in. Used by the login page
+   * because init() deliberately skips the API sync while signed out.
+   */
+  async reload() {
+    this.initialized = true;
     await this.refreshFromApi();
   }
 
@@ -114,7 +126,7 @@ export class BudgetService {
     try {
       const result = await this.api.get<any>(
         this.settings().apiBaseUrl,
-        `/api/budgets/summary/monthly?userId=${this.storage.currentUserId}&year=${year}&month=${month}`,
+        `/api/budgets/summary/monthly?year=${year}&month=${month}`,
       );
       this.budgetAmount.set(
         Number(result?.budgetAmount ?? result?.amount ?? 0),
@@ -839,7 +851,6 @@ export class BudgetService {
 
     this.saving.set(true);
     try {
-      const userId = this.storage.currentUserId;
       const accountId = Number(f.accountId) || this.accounts[0]?.accountId;
       const paymentModeId = Number(f.paymentModeId);
       const categoryId = this.categoryId(f.category);
@@ -860,7 +871,6 @@ export class BudgetService {
 
       if (type === "transaction") {
         const payload = {
-          userId,
           categoryId,
           paymentModeId,
           transactionType: f.type,
@@ -886,7 +896,6 @@ export class BudgetService {
 
       if (type === "income") {
         const payload = {
-          userId,
           sourceId: this.sourceId(f.extra),
           accountId,
           amount,
@@ -906,7 +915,6 @@ export class BudgetService {
 
       if (type === "expense") {
         const payload = {
-          userId,
           categoryId,
           accountId,
           paymentModeId,
@@ -946,7 +954,6 @@ export class BudgetService {
           );
         }
         const payload = {
-          userId,
           goalName: f.description,
           targetAmount: amount,
           savedAmount,
@@ -971,7 +978,6 @@ export class BudgetService {
         // amount field (pre-filled with the current balance), isActive is
         // carried forward so an edit cannot silently deactivate/reactivate.
         const payload = {
-          userId,
           accountType: f.accountType || this.editing?.accountType || "Checking",
           accountName: f.description,
           bankName: f.extra || null,
@@ -997,7 +1003,6 @@ export class BudgetService {
 
       if (type === "bill") {
         const payload = {
-          userId,
           accountId,
           categoryId,
           paymentModeId,
@@ -1170,6 +1175,30 @@ async deleteTransaction(t: Transaction) {
 
   updateSetting(patch: any) {
     this.storage.updateSettings(patch);
+  }
+
+  readonly colorDots = ["default", "ocean", "violet", "amber", "rose"];
+
+  changeColor(color: string) {
+    this.updateSetting({ color });
+  }
+
+  setCurrency(currency: string) {
+    this.updateSetting({ currency });
+  }
+
+  setTheme(theme: "light" | "dark") {
+    this.updateSetting({ theme });
+  }
+
+  toggleNotifications() {
+    this.updateSetting({ notifications: !this.settings().notifications });
+  }
+
+  logout() {
+    this.auth.logout();
+    this.storage.reset();
+    this.router.navigate(["/login"]);
   }
 
   exportReport() {

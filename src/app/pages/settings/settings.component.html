@@ -27,10 +27,26 @@
       </div>
       <label class="block max-w-md text-xs font-semibold"
         >Display name<input
-          [ngModel]="vm.settings().name"
-          (ngModelChange)="vm.updateSetting({ name: $event })"
-          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-2"
+          [(ngModel)]="name"
+          (blur)="saveName()"
+          (keydown.enter)="saveName()"
+          [disabled]="nameSaving"
+          placeholder="Your name"
+          class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-2 disabled:opacity-60"
       /></label>
+      <p *ngIf="nameError" class="mt-2 text-xs font-medium text-destructive">
+        {{ nameError }}
+      </p>
+      <p *ngIf="nameSaving" class="mt-2 text-xs text-muted-foreground">
+        Saving…
+      </p>
+      <p
+        *ngIf="!nameError && !nameSaving"
+        class="mt-2 text-[11px] leading-5 text-muted-foreground"
+      >
+        Shown in the sidebar and profile menu — saved to your account. Press
+        Enter or click away to save.
+      </p>
     </section>
     <section
       class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
