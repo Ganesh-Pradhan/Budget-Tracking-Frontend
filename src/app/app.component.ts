@@ -115,6 +115,11 @@ export class AppComponent implements OnInit {
   @HostListener("document:keydown.escape")
   onDocumentEscape(): void {
     this.closeProfileDropdown();
+
+    // Escape also dismisses the mobile navigation drawer.
+    if (this.vm.mobileOpen()) {
+      this.vm.mobileOpen.set(false);
+    }
   }
 
   private playThemeSwap(): void {

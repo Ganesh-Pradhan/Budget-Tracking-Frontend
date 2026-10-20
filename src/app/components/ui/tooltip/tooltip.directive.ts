@@ -28,6 +28,13 @@ export class TooltipDirective implements OnDestroy {
   /** Delay before showing on hover (ms). Keyboard focus shows immediately. */
   @Input() appTooltipDelay = 250;
 
+  /**
+   * Where the tooltip is anchored relative to the trigger.
+   * "top"   — above the trigger (default), flipping below when clipped.
+   * "right" — beside the trigger, flipping left when clipped.
+   */
+  @Input() appTooltipPlacement: "top" | "right" = "top";
+
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly document = inject(DOCUMENT);
   private readonly id = `app-tooltip-${++tooltipIdCounter}`;
@@ -138,21 +145,45 @@ export class TooltipDirective implements OnDestroy {
     const tipRect = tooltip.getBoundingClientRect();
     const gap = 8;
 
-    // Default: above the anchor. Flip below when clipped at the top.
-    let top = rect.top - tipRect.height - gap;
-    if (top < gap) {
-      top = rect.bottom + gap;
-      tooltip.classList.add("app-tooltip--below");
-    }
-
-    // Keep the tooltip inside the viewport horizontally.
+    // Keep the tooltip inside the viewport.
     const viewportWidth =
       this.document.documentElement.clientWidth || window.innerWidth;
-    let left = rect.left + rect.width / 2 - tipRect.width / 2;
-    left = Math.min(Math.max(gap, left), viewportWidth - tipRect.width - gap);
+    const viewportHeight =
+      this.document.documentElement.clientHeight || window.innerHeight;
 
-    tooltip.style.top = `${Math.round(top)}px`;
-    tooltip.style.left = `${Math.round(left)}px`;
+    if (this.appTooltipPlacement === "right") {
+      // Beside the trigger — to the right, flipping to the left when clipped.
+      let left = rect.right + gap;
+      let flipped = false;
+      if (left + tipRect.width > viewportWidth - gap) {
+        left = rect.left - tipRect.width - gap;
+        flipped = true;
+      }
+      tooltip.classList.add(
+        flipped ? "app-tooltip--side-left" : "app-tooltip--side",
+      );
+
+      // Vertically centred on the trigger, kept inside the viewport.
+      let top = rect.top + rect.height / 2 - tipRect.height / 2;
+      top = Math.min(Math.max(gap, top), viewportHeight - tipRect.height - gap);
+
+      tooltip.style.top = `${Math.round(top)}px`;
+      tooltip.style.left = `${Math.round(left)}px`;
+    } else {
+      // Default: above the anchor. Flip below when clipped at the top.
+      let top = rect.top - tipRect.height - gap;
+      if (top < gap) {
+        top = rect.bottom + gap;
+        tooltip.classList.add("app-tooltip--below");
+      }
+
+      // Keep the tooltip inside the viewport horizontally.
+      let left = rect.left + rect.width / 2 - tipRect.width / 2;
+      left = Math.min(Math.max(gap, left), viewportWidth - tipRect.width - gap);
+
+      tooltip.style.top = `${Math.round(top)}px`;
+      tooltip.style.left = `${Math.round(left)}px`;
+    }
 
     // Enable the fade/slide transition on the next frame.
     this.document.defaultView?.requestAnimationFrame(() =>

@@ -430,9 +430,24 @@
   transform: translateY(-4px);
 }
 
+/* Placed beside the anchor — slides in horizontally. */
+.app-tooltip--side {
+  transform: translateX(4px);
+}
+
+/* Flipped to the left of the anchor — slides in from the other side. */
+.app-tooltip--side-left {
+  transform: translateX(-4px);
+}
+
 .app-tooltip--visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.app-tooltip--side.app-tooltip--visible,
+.app-tooltip--side-left.app-tooltip--visible {
+  transform: translateX(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -441,7 +456,9 @@
   }
 
   .app-tooltip,
-  .app-tooltip--below {
+  .app-tooltip--below,
+  .app-tooltip--side,
+  .app-tooltip--side-left {
     transform: none;
   }
 
