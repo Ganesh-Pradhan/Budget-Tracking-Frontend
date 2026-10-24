@@ -37,7 +37,7 @@
           (click)="mode.set('login'); error.set('')"
           [class.bg-card]="mode() === 'login'"
           [class.shadow-soft]="mode() === 'login'"
-          class="rounded-lg px-3 py-2 transition-colors"
+          class="rounded-lg px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           Sign in
         </button>
@@ -47,7 +47,7 @@
           (click)="mode.set('register'); error.set('')"
           [class.bg-card]="mode() === 'register'"
           [class.shadow-soft]="mode() === 'register'"
-          class="rounded-lg px-3 py-2 transition-colors"
+          class="rounded-lg px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           Create account
         </button>
@@ -129,7 +129,7 @@
       <button
         type="submit"
         [disabled]="loading()"
-        class="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-xs font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
+        class="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{
           loading()
