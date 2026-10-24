@@ -580,11 +580,11 @@
         <div
           class="text-[11px] font-semibold uppercase tracking-[.16em] text-primary"
         >
-          {{ vm.modal() }}
+          {{ vm.modal() === 'payment-mode' ? 'payment mode' : vm.modal() }}
         </div>
 
         <h2 class="mt-1 font-display text-2xl">
-          {{ vm.modal() === 'add-money' ? 'Add money' : (vm.editing ? "Edit" : "Add") + " " + vm.modal() }}
+          {{ vm.modal() === 'add-money' ? 'Add money' : (vm.editing ? "Edit" : "Add") + " " + (vm.modal() === 'payment-mode' ? 'payment mode' : vm.modal()) }}
         </h2>
       </div>
 
@@ -657,7 +657,11 @@
               ? "Account name"
               : vm.modal() === "bill"
                 ? "Bill name"
-                : "Description"
+                : vm.modal() === "category"
+                  ? "Category name"
+                  : vm.modal() === "payment-mode"
+                    ? "Payment method name"
+                    : "Description"
         }}
 
         <input
@@ -672,7 +676,10 @@
 <div class="grid grid-cols-2 gap-3">
 
   <!-- AMOUNT -->
-  <label class="block text-xs font-semibold">
+  <label
+    *ngIf="vm.modal() !== 'category' && vm.modal() !== 'payment-mode'"
+    class="block text-xs font-semibold"
+  >
     {{
       vm.modal() === "goal"
         ? "Target amount"
@@ -826,6 +833,63 @@
       name="account-bank"
       class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
     />
+  </label>
+
+  <!-- CATEGORY TYPE (CATEGORY) -->
+  <label
+    *ngIf="vm.modal() === 'category'"
+    class="block text-xs font-semibold"
+  >
+    Category type
+    <app-custom-select
+      [(ngModel)]="vm.form.type"
+      name="category-type"
+      [options]="['Income', 'Expense']"
+      class="mt-2 w-full"
+    ></app-custom-select>
+  </label>
+
+  <!-- ICON (CATEGORY) -->
+  <label
+    *ngIf="vm.modal() === 'category'"
+    class="block text-xs font-semibold"
+  >
+    Icon (optional)
+    <input
+      type="text"
+      [(ngModel)]="vm.form.icon"
+      name="category-icon"
+      placeholder="tag"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+    />
+  </label>
+
+  <!-- DESCRIPTION (PAYMENT MODE) -->
+  <label
+    *ngIf="vm.modal() === 'payment-mode'"
+    class="block text-xs font-semibold"
+  >
+    Description (optional)
+    <input
+      type="text"
+      [(ngModel)]="vm.form.extra"
+      name="payment-mode-description"
+      class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+    />
+  </label>
+
+  <!-- ACTIVE STATUS (CATEGORY / PAYMENT MODE) -->
+  <label
+    *ngIf="vm.modal() === 'category' || vm.modal() === 'payment-mode'"
+    class="flex items-center gap-2 text-xs font-semibold"
+  >
+    <input
+      type="checkbox"
+      [(ngModel)]="vm.form.isActive"
+      name="is-active"
+      class="size-4 rounded border-input"
+    />
+    Active
   </label>
 
 </div>

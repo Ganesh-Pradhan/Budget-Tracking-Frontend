@@ -19,6 +19,8 @@ export class StorageService {
   readonly settings = signal<Settings>(this.loadSettings());
   readonly loading = signal(false);
   readonly online = signal(false);
+  readonly categoryRecords = signal<any[]>([]);
+  readonly paymentModeRecords = signal<any[]>([]);
   readonly categoryOptions = signal<{ id: number; name: string }[]>([]);
   readonly paymentModeOptions = signal<{ id: number; name: string }[]>([]);
   readonly incomeSourceOptions = signal<{ id: number; name: string }[]>([]);
@@ -113,6 +115,8 @@ export class StorageService {
         paymentRows.map((x: any) => [x.paymentModeId, x]),
       );
       const sourceById = new Map(sourceRows.map((x: any) => [x.sourceId, x]));
+      this.categoryRecords.set(categoryRows);
+      this.paymentModeRecords.set(paymentRows);
       this.categoryOptions.set(
         categoryRows
           .filter((x: any) => x.isActive)

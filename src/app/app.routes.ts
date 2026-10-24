@@ -10,6 +10,8 @@ import { YearlySummaryPageComponent } from './pages/yearly-summary/yearly-summar
 import { SavingsGoalsPageComponent } from './pages/savings-goals/savings-goals.component';
 import { AccountsPageComponent } from './pages/accounts/accounts.component';
 import { BillsPageComponent } from './pages/bills/bills.component';
+import { CategoriesPageComponent } from './pages/categories/categories.component';
+import { PaymentMethodsPageComponent } from './pages/payment-methods/payment-methods.component';
 import { ReportsPageComponent } from './pages/reports/reports.component';
 import { SettingsPageComponent } from './pages/settings/settings.component';
 import { NotFoundPageComponent } from './pages/not-found/not-found.component';
@@ -26,6 +28,8 @@ export const routes: Routes = [
   { path: 'savings-goals', component: SavingsGoalsPageComponent, canActivate: [authGuard] },
   { path: 'accounts', component: AccountsPageComponent, canActivate: [authGuard] },
   { path: 'bills', component: BillsPageComponent, canActivate: [authGuard] },
+  { path: 'categories', component: CategoriesPageComponent, canActivate: [authGuard] },
+  { path: 'payment-methods', component: PaymentMethodsPageComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsPageComponent, canActivate: [authGuard] },
   { path: 'settings', component: SettingsPageComponent, canActivate: [authGuard] },
   { path: '**', component: NotFoundPageComponent }

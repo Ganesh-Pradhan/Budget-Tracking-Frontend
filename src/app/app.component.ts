@@ -46,6 +46,8 @@ export class AppComponent implements OnInit {
   organizeItems: NavItem[] = [
     { p: "accounts", l: "Accounts", i: "landmark" },
     { p: "bills", l: "Recurring bills", i: "receipt-text" },
+    { p: "categories", l: "Categories", i: "tags" },
+    { p: "payment-methods", l: "Payment methods", i: "credit-card" },
     { p: "yearly-summary", l: "Yearly summary", i: "bar-chart-3" },
     { p: "reports", l: "Reports", i: "file-text" },
   ];

@@ -196,6 +196,8 @@ export class BudgetService {
       "savings-goals",
       "accounts",
       "bills",
+      "categories",
+      "payment-methods",
       "reports",
       "settings",
     ].includes(p)
@@ -638,6 +640,14 @@ export class BudgetService {
   get apiPaymentModes() {
     return this.storage.paymentModeOptions();
   }
+
+  get apiCategoryRecords() {
+    return this.storage.categoryRecords();
+  }
+
+  get apiPaymentModeRecords() {
+    return this.storage.paymentModeRecords();
+  }
   get apiIncomeSources() {
     return this.storage.incomeSourceOptions();
   }
@@ -681,7 +691,10 @@ export class BudgetService {
       accountType: item?.accountType || "Checking",
       accountNumber: item?.accountNumber || "",
       category: item?.category || this.categories[0] || "",
-      type: item?.transactionType || "Expense",
+      type:
+        type === "category"
+          ? item?.categoryType || "Expense"
+          : item?.transactionType || "Expense",
       extra:
         type === "income"
           ? item?.source || this.storage.incomeSourceOptions()[0]?.name || ""
@@ -692,6 +705,8 @@ export class BudgetService {
       paymentModeId: item?.paymentModeId ?? "",
       sourceId:
         item?.sourceId || this.storage.incomeSourceOptions()[0]?.id || "",
+      icon: item?.icon || "",
+      isActive: item?.isActive ?? true,
     };
   }
 
@@ -830,7 +845,12 @@ export class BudgetService {
     const amount = Number(f.amount);
     const baseUrl = this.settings().apiBaseUrl;
 
-    const amountIsValid = type === "account" ? amount >= 0 : amount > 0;
+    const amountIsValid =
+      type === "account"
+        ? amount >= 0
+        : type === "category" || type === "payment-mode"
+          ? true
+          : amount > 0;
     if (!type || !f.description?.trim() || !amountIsValid) {
       this.notify(
         type === "account"
@@ -1036,6 +1056,37 @@ export class BudgetService {
           await this.api.post(baseUrl, "/api/recurringtransactions", payload);
       }
 
+      if (type === "category") {
+        const payload = {
+          categoryName: f.description.trim(),
+          categoryType: f.type === "Income" ? "Income" : "Expense",
+          icon: f.icon?.trim() || null,
+          isActive: f.isActive ?? true,
+        };
+        if (this.editing)
+          await this.api.put(
+            baseUrl,
+            `/api/categories/${this.editing.categoryId}`,
+            payload,
+          );
+        else await this.api.post(baseUrl, "/api/categories", payload);
+      }
+
+      if (type === "payment-mode") {
+        const payload = {
+          modeName: f.description.trim(),
+          description: f.extra?.trim() || null,
+          isActive: f.isActive ?? true,
+        };
+        if (this.editing)
+          await this.api.put(
+            baseUrl,
+            `/api/paymentmodes/${this.editing.paymentModeId}`,
+            payload,
+          );
+        else await this.api.post(baseUrl, "/api/paymentmodes", payload);
+      }
+
       await this.storage.syncFromApi();
       this.applyApiOptions();
       const message = this.editing ? "Changes saved" : "Added successfully";
@@ -1115,12 +1166,16 @@ async deleteTransaction(t: Transaction) {
     }
   }
 
-  async deleteItem(type: "goals" | "accounts" | "bills", id: number) {
+  async deleteItem(type: "goals" | "accounts" | "bills" | "categories" | "payment-modes", id: number) {
     const typeLabel =
       type === "bills"
         ? "recurring bill"
         : type === "accounts"
         ? "account"
+        : type === "categories"
+        ? "category"
+        : type === "payment-modes"
+        ? "payment method"
         : "goal";
     const confirmed = await this.confirm.confirm(
       `Delete ${typeLabel}?`,
@@ -1134,11 +1189,16 @@ async deleteTransaction(t: Transaction) {
           ? "savingsgoals"
           : type === "accounts"
           ? "accounts"
+          : type === "categories"
+          ? "categories"
+          : type === "payment-modes"
+          ? "paymentmodes"
           : "recurringtransactions";
       if (!this.connectionIsAvailable())
         throw new Error("API is not connected.");
       await this.api.delete(this.settings().apiBaseUrl, `/api/${path}/${id}`);
       await this.storage.syncFromApi();
+      this.applyApiOptions();
       this.notify("Deleted successfully");
     } catch (error: any) {
       this.notify(error?.message || "Could not delete item", "error");

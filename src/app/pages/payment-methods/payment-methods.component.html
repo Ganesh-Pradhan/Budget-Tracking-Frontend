@@ -1,0 +1,58 @@
+﻿<section class="animate-in motion-reduce:animate-none">
+  <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <div class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary">
+        Organize / payments
+      </div>
+      <h1 class="font-display text-[2.4rem]">Payment methods</h1>
+      <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        Keep the ways you pay visible and consistent across transactions.
+      </p>
+    </div>
+    <button
+      (click)="vm.openModal('payment-mode')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+    >
+      <i-lucide name="plus" [size]="16"></i-lucide>Add payment method
+    </button>
+  </div>
+
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="text-xs text-muted-foreground">
+      {{ records.length }} method{{ records.length === 1 ? '' : 's' }}
+    </div>
+    <label class="relative block w-full sm:max-w-xs">
+      <span class="sr-only">Search payment methods</span>
+      <i-lucide name="search" [size]="15" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i-lucide>
+      <input type="search" [(ngModel)]="search" placeholder="Search payment methods" class="w-full rounded-xl border border-input bg-background py-2.5 pl-9 pr-3 text-sm outline-none ring-primary/30 focus:ring-2" />
+    </label>
+  </div>
+
+  <div *ngIf="vm.connection() === 'checking'" class="rounded-2xl border border-card-border bg-card p-8 text-sm text-muted-foreground">Loading payment methods…</div>
+  <div *ngIf="vm.connection() === 'disconnected'" class="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-sm text-destructive">Unable to load payment methods. Check your API connection in Settings.</div>
+  <div *ngIf="vm.connection() === 'connected' && !hasMethods" class="rounded-2xl border border-card-border bg-card p-10 text-center">
+    <i-lucide name="credit-card" class="mx-auto text-muted-foreground" [size]="28"></i-lucide>
+    <p class="mt-3 text-sm font-medium">No payment methods yet</p>
+    <p class="mt-1 text-xs text-muted-foreground">Add your first payment method to use across transactions.</p>
+    <button (click)="vm.openModal('payment-mode')" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"><i-lucide name="plus" [size]="14"></i-lucide>Add payment method</button>
+  </div>
+  <div *ngIf="vm.connection() === 'connected' && hasMethods && !hasVisible" class="rounded-2xl border border-card-border bg-card p-8 text-center text-sm text-muted-foreground">No payment methods match your search.</div>
+  <div *ngIf="vm.connection() === 'connected' && hasVisible" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <section *ngFor="let p of filtered" class="rounded-2xl border border-card-border bg-card p-5 shadow-soft transition-colors" [class.opacity-60]="!p?.isActive">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <div class="grid size-11 shrink-0 place-items-center rounded-2xl bg-secondary"><i-lucide name="credit-card" [size]="19"></i-lucide></div>
+          <div class="min-w-0">
+            <h2 class="truncate font-display text-lg">{{ p?.modeName }}</h2>
+            <p class="mt-1 truncate text-xs text-muted-foreground">{{ p?.description || 'No description' }}</p>
+            <span class="mt-2 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold" [ngClass]="p?.isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'">{{ p?.isActive ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+        <div class="flex shrink-0 items-center gap-1">
+          <button (click)="vm.openModal('payment-mode', p)" class="icon-btn icon-btn--primary" aria-label="Edit payment method" appTooltip="Edit payment method"><i-lucide name="pencil" [size]="14"></i-lucide></button>
+          <button (click)="vm.deleteItem('payment-modes', p?.paymentModeId)" class="icon-btn icon-btn--danger" aria-label="Delete payment method" appTooltip="Delete payment method"><i-lucide name="trash-2" [size]="14"></i-lucide></button>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
