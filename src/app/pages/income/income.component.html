@@ -1,5 +1,5 @@
 <section class="animate-in">
-  <div class="mb-7 flex items-end justify-between">
+  <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
     <div>
       <div class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary">
         Plan / inflow
@@ -9,17 +9,49 @@
         Track what is coming in and where it comes from.
       </p>
     </div>
-    <button (click)="vm.openModal('income')"
-      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground">
+    <button
+      (click)="vm.openModal('income')"
+      class="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      appTooltip="Add income"
+    >
       <i-lucide name="plus" [size]="16"></i-lucide>Add income
     </button>
   </div>
-  <div class="mb-5 grid gap-4 sm:grid-cols-3">
+
+  <div
+    *ngIf="vm.connection() === 'checking'"
+    class="mb-5 flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground"
+    role="status"
+    aria-live="polite"
+  >
+    <i-lucide
+      name="loader-2"
+      [size]="14"
+      class="animate-spin motion-reduce:animate-none"
+    ></i-lucide>
+    Loading income records…
+  </div>
+
+  <div
+    *ngIf="vm.connection() === 'disconnected'"
+    class="mb-5 flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between"
+    role="alert"
+  >
+    <span>Could not load income records from the API. Check your connection and try again.</span>
+    <button
+      (click)="vm.testConnection()"
+      class="inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
+      aria-label="Retry loading income records"
+    >
+      <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
+    </button>
+  </div>
+  <div class="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
       <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
         This month
       </div>
-      <div class="mt-2 font-display text-3xl">
+      <div class="mt-2 font-display text-3xl amount-income">
         {{ vm.money(vm.monthIncome) }}
       </div>
       <div class="mt-1 text-xs text-muted-foreground">
@@ -32,58 +64,209 @@
         <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
           {{ source.name }}
         </div>
-        <div class="mt-2 font-display text-3xl">
+        <div class="mt-2 font-display text-3xl amount-income">
           {{ vm.money(vm.incomeBySource(source.name)) }}
         </div>
       </div>
     </ng-container>
   </div>
+
+  <div
+    class="mb-5 flex flex-col gap-3 rounded-2xl border border-card-border bg-card p-4 shadow-soft sm:flex-row"
+  >
+    <div class="relative flex-1">
+      <i-lucide
+        name="search"
+        [size]="18"
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60"
+      ></i-lucide>
+      <input
+        [(ngModel)]="search"
+        class="w-full rounded-xl border border-input bg-background py-2.5 pl-11 pr-4 text-sm placeholder:text-muted-foreground/40 outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all motion-reduce:transition-none"
+        placeholder="Search income by description, source, or account..."
+      />
+    </div>
+    <app-custom-select
+      [(ngModel)]="sourceFilter"
+      [options]="sourceFilterOptions"
+      class="w-full sm:w-[200px]"
+    ></app-custom-select>
+  </div>
   <section class="overflow-hidden rounded-2xl border border-card-border bg-card shadow-soft">
     <div class="border-b border-border px-5 py-4">
-      <h2 class="font-display text-xl">Income history</h2>
-    </div>
-    <div class="hidden grid grid-cols-[1fr_1fr_80px] gap-3 border-b border-border px-5 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-muted-foreground sm:grid">
-      <button (click)="vm.toggleSort('date')" class="flex items-center gap-1 justify-start hover:text-foreground transition-colors"
-        [appTooltip]="vm.sortColumn() === 'date' && vm.sortDirection() === 'asc' ? 'Sort by date (ascending)' : vm.sortColumn() === 'date' ? 'Sort by date (descending)' : 'Sort by date'">
-        <span>Date</span>
-        <i-lucide [name]="vm.sortColumn() === 'date' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
-      </button>
-      <button (click)="vm.toggleSort('amount')" class="flex items-center gap-1 justify-end hover:text-foreground transition-colors"
-        [appTooltip]="vm.sortColumn() === 'amount' && vm.sortDirection() === 'asc' ? 'Sort by amount (ascending)' : vm.sortColumn() === 'amount' ? 'Sort by amount (descending)' : 'Sort by amount'">
-        <span>Amount</span>
-        <i-lucide [name]="vm.sortColumn() === 'amount' ? (vm.sortDirection() === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'" [size]="12" class="text-muted-foreground/50"></i-lucide>
-      </button>
-      <span></span>
-    </div>
-    <div *ngFor="let item of vm.sortedIncomes" class="flex items-center gap-3 border-b border-border/70 px-5 py-4">
-      <div class="grid size-9 place-items-center rounded-xl bg-primary/12 text-primary">
-        <i-lucide name="arrow-up-right" [size]="16"></i-lucide>
-      </div>
-      <div class="flex-1">
-        <div class="text-sm font-medium">{{ item.description }}</div>
-        <div class="text-[11px] text-muted-foreground">
-          {{ item.source }} · {{ vm.dateLabel(item.incomeDate) }}
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-display text-xl">Income history</h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            (click)="vm.toggleSort('date')"
+            class="rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none"
+            [appTooltip]="
+              vm.sortColumn() === 'date' && vm.sortDirection() === 'asc'
+                ? 'Sort by date (ascending)'
+                : vm.sortColumn() === 'date'
+                ? 'Sort by date (descending)'
+                : 'Sort by date'
+            "
+          >
+            Date
+            <i-lucide
+              [name]="
+                vm.sortColumn() === 'date'
+                  ? vm.sortDirection() === 'asc'
+                    ? 'arrow-up'
+                    : 'arrow-down'
+                  : 'arrow-up-down'
+              "
+              [size]="12"
+              class="ml-1 inline text-muted-foreground/50"
+            ></i-lucide>
+          </button>
+          <button
+            (click)="vm.toggleSort('amount')"
+            class="rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none"
+            [appTooltip]="
+              vm.sortColumn() === 'amount' && vm.sortDirection() === 'asc'
+                ? 'Sort by amount (ascending)'
+                : vm.sortColumn() === 'amount'
+                ? 'Sort by amount (descending)'
+                : 'Sort by amount'
+            "
+          >
+            Amount
+            <i-lucide
+              [name]="
+                vm.sortColumn() === 'amount'
+                  ? vm.sortDirection() === 'asc'
+                    ? 'arrow-up'
+                    : 'arrow-down'
+                  : 'arrow-up-down'
+              "
+              [size]="12"
+              class="ml-1 inline text-muted-foreground/50"
+            ></i-lucide>
+          </button>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="font-semibold amount-income">+{{ vm.money(item.amount) }}</div>
-        <button
-          (click)="vm.openModal('income', item)"
-          class="icon-btn icon-btn--primary"
-          aria-label="Edit income"
-          appTooltip="Edit income"
+    </div>
+    <div
+      *ngIf="vm.connection() === 'checking'"
+      class="px-5 py-8 text-sm text-muted-foreground"
+    >
+      Loading income records…
+    </div>
+
+    <div
+      *ngIf="vm.connection() === 'disconnected'"
+      class="px-5 py-8 text-sm text-destructive"
+    >
+      Unable to load income records. Check your API connection.
+    </div>
+
+    <div
+      *ngIf="vm.connection() === 'connected' && !hasIncomes"
+      class="px-5 py-10 text-center"
+    >
+      <i-lucide
+        name="arrow-up-right"
+        class="mx-auto text-muted-foreground"
+        [size]="24"
+      ></i-lucide>
+      <p class="mt-3 text-sm font-medium">No income records yet</p>
+      <p class="mt-1 text-xs text-muted-foreground">
+        Add your first income record to start tracking what comes in.
+      </p>
+      <button
+        (click)="vm.openModal('income')"
+        class="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        appTooltip="Add income"
+      >
+        <i-lucide name="plus" [size]="14"></i-lucide>Add income
+      </button>
+    </div>
+
+    <div
+      *ngIf="vm.connection() === 'connected' && hasIncomes && filteredIncomes.length === 0"
+      class="px-5 py-10 text-center"
+    >
+      <i-lucide
+        name="search"
+        class="mx-auto text-muted-foreground"
+        [size]="24"
+      ></i-lucide>
+      <p class="mt-3 text-sm font-medium">No income records match your filters</p>
+      <p class="mt-1 text-xs text-muted-foreground">
+        Try a different search term or source.
+      </p>
+      <button
+        (click)="clearFilters()"
+        class="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none"
+        appTooltip="Clear filters"
+      >
+        Clear filters
+      </button>
+    </div>
+
+    <div
+      *ngIf="vm.connection() === 'connected' && filteredIncomes.length > 0"
+      class="divide-y divide-border/70"
+    >
+      <div
+        *ngFor="let item of filteredIncomes"
+        class="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-muted/30 motion-reduce:transition-none"
+      >
+        <div
+          class="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/12 text-primary"
         >
-          <i-lucide name="pencil" [size]="14"></i-lucide>
-        </button>
-        <button
-          (click)="vm.deleteIncome(item)"
-          class="icon-btn icon-btn--danger"
-          aria-label="Delete income"
-          appTooltip="Delete income"
-        >
-          <i-lucide name="trash-2" [size]="14"></i-lucide>
-        </button>
+          <i-lucide name="arrow-up-right" [size]="16"></i-lucide>
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="truncate text-sm font-medium">
+            {{ item.description || 'Untitled income' }}
+          </div>
+          <div class="truncate text-[11px] text-muted-foreground">
+            {{ item.source }} · {{ item.account }} ·
+            {{ vm.dateLabel(item.incomeDate) }}
+          </div>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <div class="font-semibold amount-income">
+            +{{ vm.money(item.amount) }}
+          </div>
+          <button
+            (click)="vm.openModal('income', item)"
+            class="icon-btn icon-btn--primary"
+            aria-label="Edit income"
+            appTooltip="Edit income"
+          >
+            <i-lucide name="pencil" [size]="14"></i-lucide>
+          </button>
+          <button
+            (click)="vm.deleteIncome(item)"
+            class="icon-btn icon-btn--danger"
+            aria-label="Delete income"
+            appTooltip="Delete income"
+          >
+            <i-lucide name="trash-2" [size]="14"></i-lucide>
+          </button>
+        </div>
       </div>
+    </div>
+
+    <div
+      *ngIf="vm.connection() === 'connected' && hasIncomes"
+      class="border-t border-border/50 bg-muted/20 px-5 py-3"
+    >
+      <p class="text-[11px] text-muted-foreground">
+        Showing
+        <span class="font-medium text-foreground">{{
+          filteredIncomes.length
+        }}</span>
+        of
+        <span class="font-medium text-foreground">{{
+          vm.store().incomes.length
+        }}</span>
+        income records
+      </p>
     </div>
   </section>
 </section>
