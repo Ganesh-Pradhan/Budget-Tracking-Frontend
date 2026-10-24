@@ -40,12 +40,13 @@ export class DashboardPageComponent implements OnInit {
   }
 
   get summaryCards(): SummaryCard[] {
+    const net = this.vm.monthIncome - this.vm.monthExpenses;
     return [
       {
-        l: "Available to spend",
-        v: this.vm.money(this.vm.monthIncome - this.vm.monthExpenses),
-        n: "After planned bills",
-        tone: "green",
+        l: "Net this month",
+        v: this.vm.money(net),
+        n: "Income minus expenses",
+        tone: net >= 0 ? "green" : "peach",
         i: "wallet",
       },
       {
@@ -58,8 +59,10 @@ export class DashboardPageComponent implements OnInit {
       {
         l: "Spent so far",
         v: this.vm.money(this.vm.monthExpenses),
-        n: Math.round(this.vm.monthBudgetPercent) + "% of monthly budget",
-        tone: "peach",
+        n:
+          Math.round(this.rawBudgetPercent) +
+          "% of monthly budget",
+        tone: this.vm.monthBudgetPercent > 100 ? "peach" : "peach",
         i: "trending-down",
       },
       {
@@ -70,5 +73,30 @@ export class DashboardPageComponent implements OnInit {
         i: "landmark",
       },
     ];
+  }
+
+  get hasDailyBars(): boolean {
+    return this.vm.monthDailyBars.some((h) => h > 0);
+  }
+
+  get hasCategorySpend(): boolean {
+    return this.vm.categoriesSpend.length > 0;
+  }
+
+  get budgetExceeded(): boolean {
+    return (
+      this.vm.budgetAmount() > 0 &&
+      this.vm.monthExpenses > this.vm.budgetAmount()
+    );
+  }
+
+  get budgetOverAmount(): number {
+    return Math.max(0, this.vm.monthExpenses - this.vm.budgetAmount());
+  }
+
+  get rawBudgetPercent(): number {
+    return this.vm.budgetAmount() > 0
+      ? (this.vm.monthExpenses / this.vm.budgetAmount()) * 100
+      : 0;
   }
 }

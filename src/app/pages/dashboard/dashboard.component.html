@@ -1,4 +1,4 @@
-<section class="animate-in">
+﻿<section class="animate-in motion-reduce:animate-none">
   <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <div class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary">
@@ -74,20 +74,15 @@
             Your spending rhythm this month
           </p>
         </div>
-        <button class="icon-btn"
-          aria-label="More options"
-          appTooltip="More options">
-          <i-lucide name="ellipsis" [size]="18"></i-lucide>
-        </button>
       </div>
-      <div class="grid gap-6 md:grid-cols-[1fr_190px]">
+      <div *ngIf="hasDailyBars; else noDailyBars" class="grid gap-6 md:grid-cols-[1fr_190px]">
         <div class="relative h-[180px]">
           <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-border"></div>
           <div class="absolute inset-x-0 top-1/4 border-t border-dashed border-border"></div>
           <div class="absolute inset-x-0 top-3/4 border-t border-dashed border-border"></div>
           <div class="absolute inset-0 flex items-end justify-around gap-2 px-3">
             <div *ngFor="let h of vm.monthDailyBars; let i = index"
-              class="w-full max-w-[11px] rounded-t-md bg-primary/70 transition-all hover:opacity-70"
+              class="w-full max-w-[11px] rounded-t-md bg-primary/70 transition-all hover:opacity-70 motion-reduce:transition-none"
               [class.bg-accent]="i % 5 === 3" [style.height.%]="h"></div>
           </div>
           <div class="absolute -bottom-5 inset-x-0 flex justify-between px-2 text-[10px] text-muted-foreground">
@@ -102,40 +97,42 @@
                 }}</span>
             </div>
             <div class="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-              <div class="h-full rounded-full bg-accent transition-all"
+              <div class="h-full rounded-full bg-accent transition-all motion-reduce:transition-none"
                 [style.width.%]="Math.min(100, vm.monthBudgetPercent)"></div>
             </div>
           </div>
           <div>
             <div class="flex justify-between text-xs">
-              <span class="text-muted-foreground">Budget left</span><span class="font-semibold amount-income">{{
-                vm.money(vm.budgetRemaining)
+              <span class="text-muted-foreground">Budget left</span><span class="font-semibold" [class.amount-income]="!budgetExceeded" [class.amount-expense]="budgetExceeded">{{
+                budgetExceeded ? '-' + vm.money(budgetOverAmount) + ' over' : vm.money(vm.budgetRemaining)
                 }}</span>
             </div>
             <div class="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-              <div class="h-full rounded-full bg-primary transition-all" [style.width.%]="
-                 Math.min(
-                   100,
-                   vm.budgetAmount() > 0
-                     ? (vm.budgetRemaining / vm.budgetAmount()) * 100
-                     : 0
-                 )
+              <div class="h-full rounded-full transition-all motion-reduce:transition-none" [ngClass]="budgetExceeded ? 'bg-destructive' : 'bg-primary'" [style.width.%]="
+                 Math.min(100, vm.monthBudgetPercent)
                "></div>
             </div>
           </div>
           <div class="rounded-xl bg-secondary/55 p-3 text-xs leading-5 text-secondary-foreground">
             <i-lucide name="sparkles" [size]="15" class="mb-2 text-primary"></i-lucide><span>{{
               vm.budgetAmount() > 0
-              ? "Your
-              current spending is " +
-              Math.round(vm.monthBudgetPercent) +
+              ? "Your current spending is " +
+              Math.round(rawBudgetPercent) +
               "% of the monthly budget."
-              : "No monthly
-              budget is configured for this month."
+              : "No monthly budget is configured for this month."
               }}</span>
           </div>
         </div>
       </div>
+      <ng-template #noDailyBars>
+        <div class="rounded-xl border border-border bg-muted/30 p-6 text-center">
+          <i-lucide name="bar-chart-3" class="mx-auto text-muted-foreground" [size]="24"></i-lucide>
+          <p class="mt-3 text-sm font-medium">No spending recorded this month</p>
+          <p class="mt-1 text-xs text-muted-foreground">
+            Add transactions to see your daily spending rhythm.
+          </p>
+        </div>
+      </ng-template>
     </section>
     <section class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-6">
       <div class="mb-5 flex items-start justify-between">
@@ -149,7 +146,7 @@
           View all
         </button>
       </div>
-      <div class="space-y-4">
+      <div *ngIf="hasCategorySpend; else noCategorySpend" class="space-y-4">
         <div *ngFor="let item of vm.categoriesSpend.slice(0, 4); let i = index">
           <div class="mb-1.5 flex items-center justify-between text-xs">
             <span class="flex items-center gap-2"><span class="size-2 rounded-full bg-primary"
@@ -157,12 +154,21 @@
               vm.money(item.amount) }}</span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-muted">
-            <div class="h-full rounded-full bg-primary" [class.bg-accent]="i === 1" [style.width.%]="
+            <div class="h-full rounded-full bg-primary transition-all motion-reduce:transition-none" [class.bg-accent]="i === 1" [style.width.%]="
                (item.amount / (vm.categoriesSpend[0]?.amount || 1)) * 100
              "></div>
           </div>
         </div>
       </div>
+      <ng-template #noCategorySpend>
+        <div class="rounded-xl border border-border bg-muted/30 p-6 text-center">
+          <i-lucide name="pie-chart" class="mx-auto text-muted-foreground" [size]="24"></i-lucide>
+          <p class="mt-3 text-sm font-medium">No spending by category yet</p>
+          <p class="mt-1 text-xs text-muted-foreground">
+            Expenses for this month will appear here.
+          </p>
+        </div>
+      </ng-template>
       <div class="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
         <button (click)="vm.nav('reports')" class="flex w-full items-center justify-between hover:text-primary">
           See your full spending pattern <span>→</span>
@@ -242,7 +248,7 @@
           </div>
         </div>
         <div class="h-2 overflow-hidden rounded-full bg-muted">
-          <div class="h-full rounded-full bg-primary" [style.width.%]="
+          <div class="h-full rounded-full bg-primary transition-all motion-reduce:transition-none" [style.width.%]="
              Math.min(
                100,
                g.targetAmount ? (g.savedAmount / g.targetAmount) * 100 : 0
@@ -261,7 +267,7 @@
     </section>
   </div>
   <button (click)="vm.openModal('transaction')"
-    class="fixed bottom-6 right-6 z-20 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lift hover:-translate-y-1">
+    class="fixed bottom-6 right-6 z-20 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lift hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
     <i-lucide name="plus" [size]="17"></i-lucide>Add transaction
   </button>
 </section>
