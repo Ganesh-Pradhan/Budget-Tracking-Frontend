@@ -10,7 +10,19 @@
       A simple guardrail for the month.
     </p>
   </div>
-  <div class="grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
+  <div *ngIf="vm.connection() === 'checking'" class="mb-5 flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground" role="status" aria-live="polite">
+    <i-lucide name="loader-2" [size]="14" class="animate-spin motion-reduce:animate-none"></i-lucide>
+    Loading budget data…
+  </div>
+
+  <div *ngIf="vm.connection() === 'disconnected'" class="mb-5 flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between" role="alert">
+    <span>Could not load budget data from the API. Check your connection and try again.</span>
+    <button (click)="vm.testConnection()" class="inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none" aria-label="Retry loading budget data">
+      <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
+    </button>
+  </div>
+
+  <div *ngIf="vm.connection() === 'connected'" class="grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
     <section
       class="rounded-2xl border border-card-border bg-primary p-6 text-primary-foreground shadow-soft"
     >

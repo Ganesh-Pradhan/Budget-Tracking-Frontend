@@ -28,8 +28,8 @@
       <input type="search" [(ngModel)]="search" placeholder="Search categories" class="w-full rounded-xl border border-input bg-background py-2.5 pl-9 pr-3 text-sm outline-none ring-primary/30 focus:ring-2" />
     </label>
   </div>
-  <div *ngIf="vm.connection() === 'checking'" class="rounded-2xl border border-card-border bg-card p-8 text-sm text-muted-foreground">Loading categories…</div>
-  <div *ngIf="vm.connection() === 'disconnected'" class="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-sm text-destructive">Unable to load categories. Check your API connection in Settings.</div>
+  <div *ngIf="vm.connection() === 'checking'" class="rounded-2xl border border-card-border bg-card p-8 text-sm text-muted-foreground" role="status" aria-live="polite">Loading categoriesï¿½</div>
+  <div *ngIf="vm.connection() === 'disconnected'" class="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-sm text-destructive" role="alert">Unable to load categories. Check your API connection in Settings. <button (click)="vm.testConnection()" class="mt-3 inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none" aria-label="Retry loading categories"><i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry</button></div>
   <div *ngIf="vm.connection() === 'connected' && !hasCategories" class="rounded-2xl border border-card-border bg-card p-10 text-center">
     <i-lucide name="tags" class="mx-auto text-muted-foreground" [size]="28"></i-lucide>
     <p class="mt-3 text-sm font-medium">No categories yet</p>

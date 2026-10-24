@@ -39,7 +39,19 @@
       </button>
     </div>
   </div>
-  <div class="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div *ngIf="vm.connection() === 'checking'" class="mb-5 flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground" role="status" aria-live="polite">
+    <i-lucide name="loader-2" [size]="14" class="animate-spin motion-reduce:animate-none"></i-lucide>
+    Loading dashboard data…
+  </div>
+
+  <div *ngIf="vm.connection() === 'disconnected'" class="mb-5 flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between" role="alert">
+    <span>Could not load dashboard data from the API. Check your connection and try again.</span>
+    <button (click)="vm.testConnection()" class="inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none" aria-label="Retry loading dashboard data">
+      <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
+    </button>
+  </div>
+
+  <div *ngIf="vm.connection() === 'connected'" class="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
     <div *ngFor="let c of summaryCards"
       class="relative overflow-hidden rounded-2xl border border-card-border bg-card p-5 shadow-soft" [ngClass]="{
         'bg-primary text-primary-foreground': c.tone === 'green',
@@ -63,7 +75,7 @@
       <div class="mt-1 text-xs opacity-65">{{ c.n }}</div>
     </div>
   </div>
-  <div class="grid gap-5 xl:grid-cols-[1.4fr_.85fr]">
+  <div *ngIf="vm.connection() === 'connected'" class="grid gap-5 xl:grid-cols-[1.4fr_.85fr]">
     <section class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-6">
       <div class="mb-6 flex items-start justify-between">
         <div>

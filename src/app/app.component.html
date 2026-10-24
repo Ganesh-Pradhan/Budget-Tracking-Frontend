@@ -959,13 +959,13 @@
     </div>
 
     <!-- MODAL BUTTONS -->
-    <div class="mt-6 flex justify-end gap-2">
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
 
       <!-- CANCEL -->
       <button
         type="button"
         (click)="vm.closeModal()"
-        class="rounded-xl border border-border px-4 py-2.5 text-xs font-semibold"
+        class="rounded-xl border border-border px-4 py-2.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         Cancel
       </button>
@@ -1022,12 +1022,12 @@
     <p class="mt-3 text-sm text-muted-foreground">
       {{ confirm.message() }}
     </p>
-    <div class="mt-6 flex justify-end gap-2">
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
       <button
         type="button"
         (click)="confirm.onCancel()"
         [disabled]="confirm.isDeleting()"
-        class="rounded-xl border border-border px-4 py-2.5 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+        class="rounded-xl border border-border px-4 py-2.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ confirm.cancelText() }}
       </button>

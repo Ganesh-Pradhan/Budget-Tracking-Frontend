@@ -47,7 +47,7 @@
     </button>
   </div>
 
-  <div class="mb-5 grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
+  <div *ngIf="vm.connection() === 'connected'" class="mb-5 grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
     <section class="rounded-2xl border border-card-border bg-card p-6 shadow-soft">
       <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
         Spent this month

@@ -46,7 +46,7 @@
       <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
     </button>
   </div>
-  <div class="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div *ngIf="vm.connection() === 'connected'" class="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
       <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
         This month

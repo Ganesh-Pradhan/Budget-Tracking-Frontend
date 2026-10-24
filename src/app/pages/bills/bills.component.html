@@ -29,7 +29,7 @@
         Total recurring bills
       </div>
       <div class="mt-2 font-display text-4xl">
-        {{ vm.money(vm.totalBills()) }}
+        {{ vm.connection() === 'connected' ? vm.money(vm.totalBills()) : '—' }}
       </div>
       <p class="mt-2 text-xs leading-5 text-muted-foreground">
         Monthly-recurring equivalent of all active recurring bills.
@@ -75,15 +75,15 @@
         </div>
       </div>
 
-      <div *ngIf="vm.connection() === 'checking'" class="px-5 py-8 text-sm text-muted-foreground">
+      <div *ngIf="vm.connection() === 'checking'" class="px-5 py-8 text-sm text-muted-foreground" role="status" aria-live="polite">
         Loading bills…
       </div>
 
-      <div
-        *ngIf="vm.connection() === 'disconnected'"
-        class="px-5 py-8 text-sm text-destructive"
-      >
+      <div *ngIf="vm.connection() === 'disconnected'" class="px-5 py-8 text-sm text-destructive" role="alert">
         Unable to load bills. Check your API connection.
+        <button (click)="vm.testConnection()" class="mt-3 inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none" aria-label="Retry loading bills">
+          <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
+        </button>
       </div>
 
       <div
