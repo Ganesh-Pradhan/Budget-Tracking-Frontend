@@ -1,4 +1,4 @@
-<section class="animate-in">
+﻿<section class="animate-in motion-reduce:animate-none">
   <div class="mb-7">
     <div
       class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
@@ -61,53 +61,81 @@
         <label class="text-xs font-semibold"
           >Currency<app-custom-select
             [value]="vm.settings().currency"
-            (valueChange)="vm.updateSetting({ currency: $event })"
+            (valueChange)="updateCurrency($event)"
             [options]="[
+              { value: 'INR', label: 'INR · Indian Rupee' },
               { value: 'USD', label: 'USD · US Dollar' },
               { value: 'EUR', label: 'EUR · Euro' },
               { value: 'GBP', label: 'GBP · Pound Sterling' }
             ]"
             class="mt-2 w-full"
-          ></app-custom-select></label
+          ></app-custom-select
+        ><span class="mt-1 block text-[11px] leading-5 text-muted-foreground"
+          >Used for displaying amounts throughout the app. Stored monetary
+          values are not converted.</span
+        ></label
         >
         <div class="text-xs font-semibold">
           Theme
           <div class="mt-2 flex rounded-xl border border-input p-1">
             <button
-              (click)="vm.updateSetting({ theme: 'light' })"
-              class="flex-1 rounded-lg px-3 py-2 text-xs"
+              type="button"
+              (click)="updateTheme('light')"
+              [attr.aria-pressed]="vm.settings().theme === 'light'"
+              class="flex-1 rounded-lg px-3 py-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               [class.bg-secondary]="vm.settings().theme === 'light'"
             >
               Light</button
             ><button
-              (click)="vm.updateSetting({ theme: 'dark' })"
-              class="flex-1 rounded-lg px-3 py-2 text-xs"
+              type="button"
+              (click)="updateTheme('dark')"
+              [attr.aria-pressed]="vm.settings().theme === 'dark'"
+              class="flex-1 rounded-lg px-3 py-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               [class.bg-secondary]="vm.settings().theme === 'dark'"
             >
               Dark
             </button>
           </div>
+          <span class="mt-1 block text-[11px] leading-5 text-muted-foreground"
+            >Switches the app between light and dark appearance.</span
+          >
         </div>
       </div>
+    </section>
+    <section
+      class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
+    >
+      <div class="mb-6">
+        <h2 class="font-display text-xl">Notifications</h2>
+        <p class="mt-1 text-xs text-muted-foreground">
+          Reminders and nudges
+        </p>
+      </div>
       <div
-        class="mt-6 flex items-center justify-between border-t border-border pt-5"
+        class="flex items-center justify-between gap-3 border-t border-border pt-5 first:border-t-0 first:pt-0"
       >
-        <div>
+        <div class="min-w-0">
           <div class="text-sm font-medium">Weekly check-in</div>
           <p class="mt-1 text-xs text-muted-foreground">
             A gentle nudge to review your money
           </p>
         </div>
         <button
-          (click)="
-            vm.updateSetting({ notifications: !vm.settings().notifications })
+          type="button"
+          (click)="toggleNotifications()"
+          role="switch"
+          [attr.aria-checked]="vm.settings().notifications"
+          [attr.aria-label]="
+            vm.settings().notifications
+              ? 'Disable weekly check-in'
+              : 'Enable weekly check-in'
           "
-          class="relative h-6 w-11 rounded-full"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 motion-reduce:transition-none"
           [class.bg-primary]="vm.settings().notifications"
           [class.bg-muted]="!vm.settings().notifications"
         >
           <span
-            class="absolute top-1 size-4 rounded-full bg-card transition-transform"
+            class="absolute top-1 size-4 rounded-full bg-card transition-transform motion-reduce:transition-none"
             [class.left-6]="vm.settings().notifications"
             [class.left-1]="!vm.settings().notifications"
           ></span>
@@ -146,7 +174,7 @@
       <label class="block text-xs font-semibold"
         >API base URL<input
           [ngModel]="vm.settings().apiBaseUrl"
-          (ngModelChange)="vm.updateSetting({ apiBaseUrl: $event })"
+          (ngModelChange)="updateApiBaseUrl($event)"
           placeholder="http://localhost:5264"
           class="mt-2 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none ring-primary/30 focus:ring-2"
       /></label>
@@ -155,9 +183,10 @@
           The application loads and saves financial data through this API.
         </p>
         <button
+          type="button"
           (click)="vm.testConnection()"
           [disabled]="vm.apiChecking"
-          class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold transition-colors hover:border-primary/40 hover:bg-muted/60 disabled:opacity-50"
+          class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold transition-colors hover:border-primary/40 hover:bg-muted/60 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           aria-label="Test the API connection"
           appTooltip="Test the API connection"
         >

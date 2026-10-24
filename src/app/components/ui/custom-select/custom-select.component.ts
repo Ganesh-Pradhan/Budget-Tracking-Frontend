@@ -69,6 +69,20 @@ export class CustomSelectComponent implements OnChanges {
     this.isOpen = !this.isOpen;
   }
 
+
+  onTriggerKeydown(event: KeyboardEvent) {
+    if (this.disabled) return;
+    if (event.key === "Escape") {
+      this.isOpen = false;
+      event.preventDefault();
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (!this.isOpen) this.isOpen = true;
+      event.preventDefault();
+    }
+  }
+
   select(option: SelectOption) {
     if (this.isOptionDisabled(option)) return;
     const value = this.getOptionValue(option);
