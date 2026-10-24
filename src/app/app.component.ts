@@ -132,6 +132,11 @@ export class AppComponent implements OnInit {
     });
   }
 
+  logout(): void {
+    this.closeProfileDropdown();
+    this.vm.logout();
+  }
+
   /** Displayed name of the signed-in user (from the server session). */
   get userName(): string {
     return (

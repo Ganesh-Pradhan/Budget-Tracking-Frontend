@@ -16,7 +16,7 @@ import { TooltipDirective } from '../../components/ui/tooltip/tooltip.directive'
 })
 export class SettingsPageComponent implements OnInit {
   vm = inject(BudgetService);
-  private auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   /** Editable copy of the account's display name. */
   name = '';
@@ -85,6 +85,19 @@ export class SettingsPageComponent implements OnInit {
   updateApiBaseUrl(apiBaseUrl: string): void {
     if (apiBaseUrl === this.vm.settings().apiBaseUrl) return;
     this.vm.updateSetting({ apiBaseUrl });
+  }
+
+  get email(): string {
+    return this.auth.user()?.email ?? '';
+  }
+
+  getInitials(name?: string): string {
+    if (!name) return '';
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+      return words[0].slice(0, 2).toUpperCase();
+    }
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   }
 
   /** The signed-in user's name — same source as the sidebar and header. */
