@@ -1,5 +1,5 @@
-<section class="animate-in">
-  <div class="mb-7 flex items-end justify-between">
+﻿<section class="animate-in motion-reduce:animate-none">
+  <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <div
         class="mb-1 text-[11px] font-semibold uppercase tracking-[.18em] text-primary"
@@ -13,20 +13,55 @@
     </div>
     <button
       (click)="vm.exportReport()"
-      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-soft transition-colors hover:border-primary/40 hover:bg-muted/60"
+      class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-soft transition-colors hover:border-primary/40 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
       aria-label="Export report as CSV"
       appTooltip="Export report as CSV"
     >
       <i-lucide name="download" [size]="15"></i-lucide>Export
     </button>
   </div>
+
+  <div
+    *ngIf="vm.connection() === 'checking'"
+    class="mb-5 flex items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground"
+    role="status"
+    aria-live="polite"
+  >
+    <i-lucide
+      name="loader-2"
+      [size]="14"
+      class="animate-spin motion-reduce:animate-none"
+    ></i-lucide>
+    Loading report data…
+  </div>
+
+  <div
+    *ngIf="vm.connection() === 'disconnected'"
+    class="mb-5 flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between"
+    role="alert"
+  >
+    <span>Could not load report data from the API. Check your connection and try again.</span>
+    <button
+      (click)="vm.testConnection()"
+      class="inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
+      aria-label="Retry loading report data"
+    >
+      <i-lucide name="refresh-cw" [size]="13"></i-lucide>Retry
+    </button>
+  </div>
+
   <div
     class="mb-5 flex w-fit items-center gap-1 rounded-xl border border-border bg-card p-1 shadow-soft"
+    role="tablist"
+    aria-label="Report view"
   >
     <button
       *ngFor="let p of reportPeriods"
       (click)="vm.setReportPeriod(p)"
-      class="rounded-lg px-3 py-2 text-xs font-semibold"
+      role="tab"
+      [attr.aria-selected]="vm.reportPeriod === p"
+      [tabindex]="vm.reportPeriod === p ? 0 : -1"
+      class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
       [ngClass]="
         vm.reportPeriod === p
           ? 'bg-primary text-primary-foreground'
@@ -36,26 +71,58 @@
       {{ p }}
     </button>
   </div>
+  <div class="mb-5 grid gap-4 sm:grid-cols-3">
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        Total income
+      </div>
+      <div class="mt-2 font-display text-2xl amount-income">
+        {{ vm.money(reportTotalIncome) }}
+      </div>
+    </div>
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        Total expense
+      </div>
+      <div class="mt-2 font-display text-2xl amount-expense">
+        {{ vm.money(reportTotalExpense) }}
+      </div>
+    </div>
+    <div class="rounded-2xl border border-card-border bg-card p-5 shadow-soft">
+      <div class="text-[11px] uppercase tracking-[.13em] text-muted-foreground">
+        Net
+      </div>
+      <div
+        class="mt-2 font-display text-2xl"
+        [ngClass]="reportNet >= 0 ? 'amount-income' : 'amount-expense'"
+      >
+        {{ vm.money(reportNet) }}
+      </div>
+    </div>
+  </div>
+
   <div class="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
     <section
       class="rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
     >
-      <div class="flex items-start justify-between">
-        <div>
-          <h2 class="font-display text-xl">{{ vm.reportPeriod }} spending</h2>
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h2 class="font-display text-xl">
+            {{ vm.reportPeriod }} spending
+          </h2>
           <p class="mt-1 text-xs text-muted-foreground">
             {{ vm.reportSubtitle }}
           </p>
         </div>
         <i-lucide
           name="bar-chart-3"
-          class="text-primary"
+          class="shrink-0 text-primary"
           [size]="19"
         ></i-lucide>
       </div>
       <div
         *ngIf="vm.reportPeriod !== 'Categories'"
-        class="mt-4 flex items-center gap-4 text-[11px] text-muted-foreground"
+        class="mt-4 flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground"
       >
         <span class="flex items-center gap-1.5"
           ><span class="size-2 rounded-full bg-primary"></span>Income</span
@@ -65,12 +132,23 @@
         >
       </div>
       <div
+        *ngIf="vm.reportPeriod === 'Categories'"
+        class="mt-4 flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground"
+      >
+        <span class="flex items-center gap-1.5"
+          ><span class="size-2 rounded-full bg-primary"></span>Expense by
+          category</span
+        >
+      </div>
+      <div
         *ngIf="vm.reportChartItems.length; else noReportData"
-        class="mt-8 flex h-[220px] items-end gap-3"
+        class="mt-8 flex h-[200px] items-end gap-1 overflow-x-auto sm:h-[220px] sm:gap-3"
+        role="img"
+        aria-label="Report chart"
       >
         <div
           *ngFor="let item of vm.reportChartItems"
-          class="group flex h-full flex-1 flex-col items-center gap-2"
+          class="group flex h-full min-w-[2rem] flex-1 flex-col items-center gap-2"
         >
           <div
             class="flex w-full flex-1 items-end justify-center gap-1"
@@ -86,13 +164,13 @@
           >
             <div
               *ngIf="vm.reportPeriod !== 'Categories'"
-              class="w-full max-w-6 rounded-t-lg bg-primary/65 transition-all group-hover:bg-primary"
+              class="w-full max-w-6 rounded-t-lg bg-primary/65 transition-all group-hover:bg-primary motion-reduce:transition-none"
               [style.height.%]="
                 item.income > 0 ? (item.income / (vm.reportChartMax || 1)) * 100 : 0
               "
             ></div>
             <div
-              class="w-full rounded-t-lg transition-all"
+              class="w-full rounded-t-lg transition-all motion-reduce:transition-none"
               [ngClass]="
                 vm.reportPeriod === 'Categories'
                   ? 'bg-primary/65 group-hover:bg-primary'
@@ -106,15 +184,24 @@
           <span
             class="max-w-full truncate text-[10px] text-muted-foreground"
             [title]="item.label"
-            >{{
-            item.label
-          }}</span>
+            >{{ item.label }}</span
+          >
         </div>
       </div>
       <ng-template #noReportData>
-        <p class="mt-8 rounded-xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
-          No records found for this view yet.
-        </p>
+        <div
+          class="mt-8 rounded-xl border border-border bg-muted/30 p-6 text-center"
+        >
+          <i-lucide
+            name="bar-chart-3"
+            class="mx-auto text-muted-foreground"
+            [size]="24"
+          ></i-lucide>
+          <p class="mt-3 text-sm font-medium">No records for this view yet</p>
+          <p class="mt-1 text-xs text-muted-foreground">
+            Add income and expenses to see this report populate.
+          </p>
+        </div>
       </ng-template>
     </section>
     <section
@@ -124,15 +211,20 @@
       <p class="mt-1 text-xs text-muted-foreground">
         Where the most went this period
       </p>
-      <div class="mt-8 flex items-center gap-5">
+      <div
+        *ngIf="vm.topCategories.length; else noTopCategory"
+        class="mt-8 flex flex-col items-center gap-5 sm:flex-row sm:items-center"
+      >
         <div
-          class="relative grid size-32 place-items-center rounded-full"
-          style="
-            background: conic-gradient(
-              hsl(var(--primary)) 0 var(--top-category-percent),
-              hsl(var(--accent)) var(--top-category-percent) 100%
-            );
-          "
+          class="relative grid size-32 shrink-0 place-items-center rounded-full"
+          [ngStyle]="{
+            background:
+              'conic-gradient(hsl(var(--primary)) 0 ' +
+              (vm.topCategories[0]?.percent || 0) +
+              '%, hsl(var(--accent)) ' +
+              (vm.topCategories[0]?.percent || 0) +
+              '% 100%)'
+          }"
         >
           <div
             class="grid size-20 place-items-center rounded-full bg-card font-display text-xl"
@@ -140,19 +232,42 @@
             {{ vm.topCategories[0]?.percent || 0 }}%
           </div>
         </div>
-        <div class="space-y-2 text-xs">
+        <div class="w-full space-y-2 text-xs">
           <div
             *ngFor="let x of vm.topCategories"
             class="flex items-center gap-2"
           >
-            <span class="size-2 rounded-full bg-primary"></span
-            ><span class="text-muted-foreground">{{ x.category }}</span
-            ><strong class="ml-auto">{{ x.percent }}%</strong>
+            <span class="size-2 shrink-0 rounded-full bg-primary"></span>
+            <span
+              class="min-w-0 flex-1 truncate text-muted-foreground"
+              [title]="x.category"
+              >{{ x.category }}</span
+            >
+            <span class="text-[11px] text-muted-foreground">{{
+              vm.money(x.amount)
+            }}</span>
+            <strong class="ml-2">{{ x.percent }}%</strong>
           </div>
         </div>
       </div>
+      <ng-template #noTopCategory>
+        <div
+          class="mt-8 rounded-xl border border-border bg-muted/30 p-6 text-center"
+        >
+          <i-lucide
+            name="pie-chart"
+            class="mx-auto text-muted-foreground"
+            [size]="24"
+          ></i-lucide>
+          <p class="mt-3 text-sm font-medium">No spending by category yet</p>
+          <p class="mt-1 text-xs text-muted-foreground">
+            Expenses for the current month will appear here.
+          </p>
+        </div>
+      </ng-template>
     </section>
   </div>
+
   <section
     class="mt-5 rounded-2xl border border-card-border bg-card p-5 shadow-soft sm:p-7"
   >
