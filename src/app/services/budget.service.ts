@@ -621,14 +621,7 @@ export class BudgetService {
       .sort((a, b) => b.amount - a.amount);
   }
 
-  private monthExpensesByCategory(category: string) {
-    return this.store()
-      .expenses.filter(
-        (e) =>
-          e.expenseDate.startsWith(this.month()) && e.category === category,
-      )
-      .reduce((sum, e) => sum + e.amount, 0);
-  }
+
 
   get filteredTransactions() {
     let result = this.store().transactions.filter(
@@ -874,13 +867,6 @@ export class BudgetService {
     return this.storage.categoryOptions().find((x) => x.name === name)?.id || 0;
   }
 
-  private paymentModeId(name?: string): number {
-    return (
-      this.storage.paymentModeOptions().find((x) => x.name === name)?.id ||
-      Number(this.form.paymentModeId) ||
-      0
-    );
-  }
 
   private sourceId(name?: string): number {
     return (

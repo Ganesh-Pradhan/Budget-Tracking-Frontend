@@ -29,7 +29,7 @@ export class CustomSelectComponent implements OnChanges, OnInit, OnDestroy {
   selectedValue: any;
   displayValue = "";
 
-  private onChange = (value: any) => {};
+  private onChange = (_value: any) => {};
   private onTouched = () => {};
 
   private readonly onDocumentClickCapture = (event: MouseEvent) => {
