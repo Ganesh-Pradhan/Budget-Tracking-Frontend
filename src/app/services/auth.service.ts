@@ -175,6 +175,9 @@ export class AuthService {
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        this.logout();
+      }
       let message =
         parsed?.message ||
         (typeof parsed === "string" && parsed) ||

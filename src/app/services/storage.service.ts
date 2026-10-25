@@ -140,7 +140,7 @@ export class StorageService {
           categoryId: x.categoryId,
           paymentModeId: x.paymentModeId,
           transactionType: x.transactionType,
-          amount: Number(x.amount),
+          amount: Number(x.amount) || 0,
           transactionDate: this.date(x.transactionDate),
           description: x.description || "",
           category:
@@ -159,7 +159,7 @@ export class StorageService {
           userId: x.userId,
           sourceId: x.sourceId,
           accountId: x.accountId,
-          amount: Number(x.amount),
+          amount: Number(x.amount) || 0,
           incomeDate: this.date(x.incomeDate),
           description: x.description || "",
           source:
@@ -176,7 +176,7 @@ export class StorageService {
           categoryId: x.categoryId,
           accountId: x.accountId,
           paymentModeId: x.paymentModeId,
-          amount: Number(x.amount),
+          amount: Number(x.amount) || 0,
           expenseDate: this.date(x.expenseDate),
           description: x.description || "",
           category:
@@ -200,8 +200,8 @@ export class StorageService {
           x.Id,
         userId: x.userId ?? x.UserId,
         goalName: x.goalName ?? x.GoalName,
-        targetAmount: Number(x.targetAmount ?? x.TargetAmount),
-        savedAmount: Number(x.savedAmount ?? x.SavedAmount),
+        targetAmount: Number(x.targetAmount ?? x.TargetAmount) || 0,
+        savedAmount: Number(x.savedAmount ?? x.SavedAmount) || 0,
         targetDate: (x.targetDate ?? x.TargetDate)
           ? this.date(x.targetDate ?? x.TargetDate)
           : "",
@@ -214,7 +214,7 @@ export class StorageService {
         accountName: x.accountName ?? x.AccountName,
         bankName: (x.bankName ?? x.BankName) || "",
         accountNumber: (x.accountNumber ?? x.AccountNumber) || "",
-        balance: Number(x.balance ?? x.Balance),
+        balance: Number(x.balance ?? x.Balance) || 0,
         isActive: (x.isActive ?? x.IsActive) ?? true,
       }));
 
@@ -225,7 +225,7 @@ export class StorageService {
         categoryId: x.categoryId,
         paymentModeId: x.paymentModeId,
         transactionType: "Expense",
-        amount: Number(x.amount),
+        amount: Number(x.amount) || 0,
         description: x.description || "",
         frequency: x.frequency,
         startDate: this.date(x.startDate),
@@ -248,7 +248,6 @@ export class StorageService {
     } catch (error) {
       console.error("Budget Tracker API sync failed", error);
       this.online.set(false);
-      this.updateStore(emptyStore());
       throw error;
     } finally {
       this.loading.set(false);
@@ -284,7 +283,8 @@ export class StorageService {
   }
 
   private rows(value: any): any[] {
-    return Array.isArray(value) ? value : value?.data || [];
+    const result = Array.isArray(value) ? value : value?.data || [];
+    return Array.isArray(result) ? result.filter((x) => x != null) : [];
   }
 
   private date(value: string): string {

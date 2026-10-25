@@ -132,7 +132,8 @@ export class BudgetService {
         Number(result?.budgetAmount ?? result?.amount ?? 0),
       );
     } catch {
-      this.budgetAmount.set(0);
+      // Keep the last known budget amount instead of masking a failed
+      // request with a misleading zero.
     }
   }
 
@@ -1087,8 +1088,13 @@ export class BudgetService {
         else await this.api.post(baseUrl, "/api/paymentmodes", payload);
       }
 
-      await this.storage.syncFromApi();
-      this.applyApiOptions();
+      try {
+        await this.storage.syncFromApi();
+        this.applyApiOptions();
+      } catch {
+        // Save already succeeded; a refresh failure should not be reported
+        // as a failed save.
+      }
       const message = this.editing ? "Changes saved" : "Added successfully";
       this.closeModal();
       this.notify(message);
@@ -1117,7 +1123,11 @@ async deleteTransaction(t: Transaction) {
         this.settings().apiBaseUrl,
         `/api/transactions/${t.transactionId}`,
       );
-      await this.storage.syncFromApi();
+      try {
+        await this.storage.syncFromApi();
+      } catch {
+        // Delete succeeded; a refresh failure should not be reported as a failed delete.
+      }
       this.notify("Transaction deleted");
     } catch (error: any) {
       this.notify(error?.message || "Could not delete transaction", "error");
@@ -1138,7 +1148,11 @@ async deleteTransaction(t: Transaction) {
         this.settings().apiBaseUrl,
         `/api/incomes/${income.incomeId}`,
       );
-      await this.storage.syncFromApi();
+      try {
+        await this.storage.syncFromApi();
+      } catch {
+        // Delete succeeded; a refresh failure should not be reported as a failed delete.
+      }
       this.notify("Income deleted");
     } catch (error: any) {
       this.notify(error?.message || "Could not delete income", "error");
@@ -1159,7 +1173,11 @@ async deleteTransaction(t: Transaction) {
         this.settings().apiBaseUrl,
         `/api/expenses/${expense.expenseId}`,
       );
-      await this.storage.syncFromApi();
+      try {
+        await this.storage.syncFromApi();
+      } catch {
+        // Delete succeeded; a refresh failure should not be reported as a failed delete.
+      }
       this.notify("Expense deleted");
     } catch (error: any) {
       this.notify(error?.message || "Could not delete expense", "error");
@@ -1197,8 +1215,12 @@ async deleteTransaction(t: Transaction) {
       if (!this.connectionIsAvailable())
         throw new Error("API is not connected.");
       await this.api.delete(this.settings().apiBaseUrl, `/api/${path}/${id}`);
-      await this.storage.syncFromApi();
-      this.applyApiOptions();
+      try {
+        await this.storage.syncFromApi();
+        this.applyApiOptions();
+      } catch {
+        // Delete succeeded; a refresh failure should not be reported as a failed delete.
+      }
       this.notify("Deleted successfully");
     } catch (error: any) {
       this.notify(error?.message || "Could not delete item", "error");

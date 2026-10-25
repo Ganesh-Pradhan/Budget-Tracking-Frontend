@@ -42,7 +42,10 @@ export class ApiService {
       // The JWT is missing, malformed or expired — end the local session so
       // the auth guard can redirect to the login page on the next navigation.
       this.auth.logout();
-      this.router.navigate(["/login"]);
+      const currentPath = this.router.url.split("?")[0];
+      if (currentPath !== "/login" && currentPath !== "/signup") {
+        this.router.navigate(["/login"]);
+      }
     }
 
     if (!response.ok) {

@@ -57,7 +57,6 @@ export class SettingsPageComponent implements OnInit {
       this.vm.notify('Display name updated');
     } catch (error: any) {
       this.nameError = error?.message ?? 'Could not save the display name.';
-      this.name = this.currentName();
       this.vm.notify(this.nameError, 'error');
     } finally {
       this.nameSaving = false;

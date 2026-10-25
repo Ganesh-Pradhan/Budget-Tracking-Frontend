@@ -60,6 +60,7 @@ export class LoginPageComponent {
       await this.router.navigate(["/dashboard"]);
     } catch (err: any) {
       this.error.set(err?.message || "Something went wrong. Please try again.");
+    } finally {
       this.loading.set(false);
     }
   }
