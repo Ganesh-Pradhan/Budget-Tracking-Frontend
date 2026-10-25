@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, Output, EventEmitter, HostListener, ElementRef, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, forwardRef, Input, Output, EventEmitter, ElementRef, OnChanges, SimpleChanges, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
@@ -15,7 +15,7 @@ export type SelectOption = string | any;
   templateUrl: "./custom-select.component.html",
   styleUrl: "./custom-select.component.css",
 })
-export class CustomSelectComponent implements OnChanges {
+export class CustomSelectComponent implements OnChanges, OnInit, OnDestroy {
   @Input() options: SelectOption[] = [];
   @Input() placeholder = "";
   @Input() disabled = false;
@@ -32,11 +32,18 @@ export class CustomSelectComponent implements OnChanges {
   private onChange = (value: any) => {};
   private onTouched = () => {};
 
-  @HostListener("document:click", ["$event"])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+  private readonly onDocumentClickCapture = (event: MouseEvent) => {
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
       this.isOpen = false;
     }
+  };
+
+  ngOnInit() {
+    document.addEventListener("click", this.onDocumentClickCapture, true);
+  }
+
+  ngOnDestroy() {
+    document.removeEventListener("click", this.onDocumentClickCapture, true);
   }
 
   constructor(private elementRef: ElementRef) {}
