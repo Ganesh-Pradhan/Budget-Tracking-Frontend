@@ -41,6 +41,7 @@ export class TooltipDirective implements OnDestroy {
 
   private tooltip: HTMLElement | null = null;
   private showTimer: ReturnType<typeof setTimeout> | null = null;
+  private hideTimer: ReturnType<typeof setTimeout> | null = null;
 
   @HostListener("mouseenter")
   onMouseEnter(): void {
@@ -98,6 +99,10 @@ export class TooltipDirective implements OnDestroy {
 
   ngOnDestroy(): void {
     this.cancelScheduledShow();
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
     this.hideNow();
   }
 
@@ -205,10 +210,17 @@ export class TooltipDirective implements OnDestroy {
     this.el.nativeElement.removeAttribute("aria-describedby");
 
     // Remove after the fade-out transition.
-    setTimeout(() => tip.remove(), 160);
+    this.hideTimer = setTimeout(() => {
+      tip.remove();
+      this.hideTimer = null;
+    }, 160);
   }
 
   private hideNow(): void {
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
     if (!this.tooltip) {
       return;
     }

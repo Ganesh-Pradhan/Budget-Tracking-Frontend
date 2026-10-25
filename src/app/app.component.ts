@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
-import { Component, HostListener, OnInit, inject, signal } from "@angular/core";
+import { Component, HostListener, OnInit, inject, signal, DestroyRef } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterOutlet } from "@angular/router";
 import { LucideAngularModule } from "lucide-angular";
@@ -64,10 +65,12 @@ export class AppComponent implements OnInit {
   /** Briefly true after a theme switch to play the icon-swap animation. */
   themeAnimating = false;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private route: ActivatedRoute) {}
 
   async ngOnInit() {
-    this.route.url.subscribe(() => {
+    this.route.url.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.vm.mobileOpen.set(false);
     });
 

@@ -1,36 +1,21 @@
 import { Routes } from '@angular/router';
 import { authGuard, signedInGuard } from './guards/auth.guard';
-import { LoginPageComponent } from './pages/login/login.component';
-import { DashboardPageComponent } from './pages/dashboard/dashboard.component';
-import { TransactionsPageComponent } from './pages/transactions/transactions.component';
-import { IncomePageComponent } from './pages/income/income.component';
-import { ExpensesPageComponent } from './pages/expenses/expenses.component';
-import { BudgetPageComponent } from './pages/budget/budget.component';
-import { YearlySummaryPageComponent } from './pages/yearly-summary/yearly-summary.component';
-import { SavingsGoalsPageComponent } from './pages/savings-goals/savings-goals.component';
-import { AccountsPageComponent } from './pages/accounts/accounts.component';
-import { BillsPageComponent } from './pages/bills/bills.component';
-import { CategoriesPageComponent } from './pages/categories/categories.component';
-import { PaymentMethodsPageComponent } from './pages/payment-methods/payment-methods.component';
-import { ReportsPageComponent } from './pages/reports/reports.component';
-import { SettingsPageComponent } from './pages/settings/settings.component';
-import { NotFoundPageComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'login', component: LoginPageComponent, canActivate: [signedInGuard] },
-  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
-  { path: 'transactions', component: TransactionsPageComponent, canActivate: [authGuard] },
-  { path: 'income', component: IncomePageComponent, canActivate: [authGuard] },
-  { path: 'expenses', component: ExpensesPageComponent, canActivate: [authGuard] },
-  { path: 'budget', component: BudgetPageComponent, canActivate: [authGuard] },
-  { path: 'yearly-summary', component: YearlySummaryPageComponent, canActivate: [authGuard] },
-  { path: 'savings-goals', component: SavingsGoalsPageComponent, canActivate: [authGuard] },
-  { path: 'accounts', component: AccountsPageComponent, canActivate: [authGuard] },
-  { path: 'bills', component: BillsPageComponent, canActivate: [authGuard] },
-  { path: 'categories', component: CategoriesPageComponent, canActivate: [authGuard] },
-  { path: 'payment-methods', component: PaymentMethodsPageComponent, canActivate: [authGuard] },
-  { path: 'reports', component: ReportsPageComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsPageComponent, canActivate: [authGuard] },
-  { path: '**', component: NotFoundPageComponent }
+  { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginPageComponent), canActivate: [signedInGuard] },
+  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardPageComponent), canActivate: [authGuard] },
+  { path: 'transactions', loadComponent: () => import('./pages/transactions/transactions.component').then(m => m.TransactionsPageComponent), canActivate: [authGuard] },
+  { path: 'income', loadComponent: () => import('./pages/income/income.component').then(m => m.IncomePageComponent), canActivate: [authGuard] },
+  { path: 'expenses', loadComponent: () => import('./pages/expenses/expenses.component').then(m => m.ExpensesPageComponent), canActivate: [authGuard] },
+  { path: 'budget', loadComponent: () => import('./pages/budget/budget.component').then(m => m.BudgetPageComponent), canActivate: [authGuard] },
+  { path: 'yearly-summary', loadComponent: () => import('./pages/yearly-summary/yearly-summary.component').then(m => m.YearlySummaryPageComponent), canActivate: [authGuard] },
+  { path: 'savings-goals', loadComponent: () => import('./pages/savings-goals/savings-goals.component').then(m => m.SavingsGoalsPageComponent), canActivate: [authGuard] },
+  { path: 'accounts', loadComponent: () => import('./pages/accounts/accounts.component').then(m => m.AccountsPageComponent), canActivate: [authGuard] },
+  { path: 'bills', loadComponent: () => import('./pages/bills/bills.component').then(m => m.BillsPageComponent), canActivate: [authGuard] },
+  { path: 'categories', loadComponent: () => import('./pages/categories/categories.component').then(m => m.CategoriesPageComponent), canActivate: [authGuard] },
+  { path: 'payment-methods', loadComponent: () => import('./pages/payment-methods/payment-methods.component').then(m => m.PaymentMethodsPageComponent), canActivate: [authGuard] },
+  { path: 'reports', loadComponent: () => import('./pages/reports/reports.component').then(m => m.ReportsPageComponent), canActivate: [authGuard] },
+  { path: 'settings', loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsPageComponent), canActivate: [authGuard] },
+  { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundPageComponent) }
 ];

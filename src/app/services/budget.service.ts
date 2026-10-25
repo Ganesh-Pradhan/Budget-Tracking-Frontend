@@ -206,22 +206,40 @@ export class BudgetService {
       : "not-found";
   }
 
+  private moneyFormatter: Intl.NumberFormat | null = null;
+  private moneyCurrency = "";
+  private compactMoneyFormatter: Intl.NumberFormat | null = null;
+  private compactMoneyCurrency = "";
+
   money(v: number) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: this.settings().currency,
-      maximumFractionDigits: 2,
-    }).format(v || 0);
+    const currency = this.settings().currency;
+    if (!this.moneyFormatter || this.moneyCurrency !== currency) {
+      this.moneyCurrency = currency;
+      this.moneyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 2,
+      });
+    }
+    return this.moneyFormatter.format(v || 0);
   }
 
   compactMoney(v: number) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: this.settings().currency,
-      notation: "compact",
-      maximumFractionDigits: 1,
-    }).format(v || 0);
+    const currency = this.settings().currency;
+    if (!this.compactMoneyFormatter || this.compactMoneyCurrency !== currency) {
+      this.compactMoneyCurrency = currency;
+      this.compactMoneyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency,
+        notation: "compact",
+        maximumFractionDigits: 1,
+      });
+    }
+    return this.compactMoneyFormatter.format(v || 0);
   }
+
+  private shortDateFormatter: Intl.DateTimeFormat | null = null;
+  private longMonthFormatter: Intl.DateTimeFormat | null = null;
 
   dateLabel(v: string | null | undefined) {
     if (v == null) return "No target date";
@@ -229,17 +247,23 @@ export class BudgetService {
     if (!text) return "No target date";
     const parsed = new Date(`${text}T12:00:00`);
     if (isNaN(parsed.getTime())) return "No target date";
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-    }).format(parsed);
+    if (!this.shortDateFormatter) {
+      this.shortDateFormatter = new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+    return this.shortDateFormatter.format(parsed);
   }
 
   monthLabel(v: string) {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      year: "numeric",
-    }).format(new Date(`${v}-01T12:00:00`));
+    if (!this.longMonthFormatter) {
+      this.longMonthFormatter = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return this.longMonthFormatter.format(new Date(`${v}-01T12:00:00`));
   }
 
   get currentYear() {
@@ -257,42 +281,37 @@ export class BudgetService {
   get monthDailyBars() {
     const [year, month] = this.month().split("-").map(Number);
     const days = new Date(year, month, 0).getDate();
-    let daily: number[] = [];
+    const monthPrefix = this.month();
     const metric = this.chartMetric();
-    
-    if (metric === "expenses") {
-      daily = Array.from({ length: days }, (_, i) =>
-        this.store()
-          .expenses.filter(
-            (e) =>
-              e.expenseDate ===
-              `${this.month()}-${String(i + 1).padStart(2, "0")}`,
-          )
-          .reduce((sum, e) => sum + e.amount, 0),
+    const expensesByDate = new Map<string, number>();
+    const incomesByDate = new Map<string, number>();
+
+    for (const expense of this.store().expenses || []) {
+      if (!expense.expenseDate?.startsWith(monthPrefix)) continue;
+      expensesByDate.set(
+        expense.expenseDate,
+        (expensesByDate.get(expense.expenseDate) || 0) + (Number(expense.amount) || 0),
       );
-    } else if (metric === "income") {
-      daily = Array.from({ length: days }, (_, dayIndex) =>
-        this.store()
-          .incomes.filter(
-            (inc) =>
-              inc.incomeDate ===
-              `${this.month()}-${String(dayIndex + 1).padStart(2, "0")}`,
-          )
-          .reduce((sum, inc) => sum + inc.amount, 0),
-      );
-    } else if (metric === "net") {
-      daily = Array.from({ length: days }, (_, dayIndex) => {
-        const dateStr = `${this.month()}-${String(dayIndex + 1).padStart(2, "0")}`;
-        const expenses = this.store()
-          .expenses.filter((e) => e.expenseDate === dateStr)
-          .reduce((sum, e) => sum + e.amount, 0);
-        const income = this.store()
-          .incomes.filter((inc) => inc.incomeDate === dateStr)
-          .reduce((sum, inc) => sum + inc.amount, 0);
-        return income - expenses;
-      });
     }
-    
+    for (const income of this.store().incomes || []) {
+      if (!income.incomeDate?.startsWith(monthPrefix)) continue;
+      incomesByDate.set(
+        income.incomeDate,
+        (incomesByDate.get(income.incomeDate) || 0) + (Number(income.amount) || 0),
+      );
+    }
+
+    const daily = Array.from({ length: days }, (_, dayIndex) => {
+      const dateStr = `${monthPrefix}-${String(dayIndex + 1).padStart(2, "0")}`;
+      if (metric === "expenses") {
+        return expensesByDate.get(dateStr) || 0;
+      }
+      if (metric === "income") {
+        return incomesByDate.get(dateStr) || 0;
+      }
+      return (incomesByDate.get(dateStr) || 0) - (expensesByDate.get(dateStr) || 0);
+    });
+
     const max = Math.max(...daily.map(Math.abs), 1);
     return daily.map((v) => Math.max(3, Math.round((Math.abs(v) / max) * 100)));
   }
@@ -342,31 +361,64 @@ export class BudgetService {
   /** Monthly income + expense totals for the selected reporting year. */
   get monthlyIncomeExpense(): { label: string; income: number; expense: number; amount: number }[] {
     const year = this.reportYear;
+    const incomeByMonth = new Map<number, number>();
+    const expenseByMonth = new Map<number, number>();
+
+    for (const income of this.store().incomes || []) {
+      const incomeDate = income.incomeDate || "";
+      if (!incomeDate.startsWith(`${year}-`)) continue;
+      const monthIndex = Number(incomeDate.slice(5, 7)) - 1;
+      if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) continue;
+      incomeByMonth.set(
+        monthIndex,
+        (incomeByMonth.get(monthIndex) || 0) + (Number(income.amount) || 0),
+      );
+    }
+    for (const expense of this.store().expenses || []) {
+      const expenseDate = expense.expenseDate || "";
+      if (!expenseDate.startsWith(`${year}-`)) continue;
+      const monthIndex = Number(expenseDate.slice(5, 7)) - 1;
+      if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) continue;
+      expenseByMonth.set(
+        monthIndex,
+        (expenseByMonth.get(monthIndex) || 0) + (Number(expense.amount) || 0),
+      );
+    }
+
     return Array.from({ length: 12 }, (_, m) => {
-      const key = `${year}-${String(m + 1).padStart(2, '0')}`;
-      const income = (this.store().incomes || [])
-        .filter((i) => (i.incomeDate || '').startsWith(key))
-        .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-      const expense = (this.store().expenses || [])
-        .filter((e) => (e.expenseDate || '').startsWith(key))
-        .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-      const label = new Date(year, m, 1).toLocaleString('en-US', { month: 'short' });
+      const income = incomeByMonth.get(m) || 0;
+      const expense = expenseByMonth.get(m) || 0;
+      const label = new Date(year, m, 1).toLocaleString("en-US", { month: "short" });
       return { label, income, expense, amount: expense };
     });
   }
 
   /** Yearly income + expense totals grouped by actual calendar year. */
   get yearlyIncomeExpense(): { label: string; income: number; expense: number; amount: number }[] {
-    return this.reportYears.map((year) => {
-      const prefix = `${year}-`;
-      const income = (this.store().incomes || [])
-        .filter((i) => (i.incomeDate || '').startsWith(prefix))
-        .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-      const expense = (this.store().expenses || [])
-        .filter((e) => (e.expenseDate || '').startsWith(prefix))
-        .reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-      return { label: String(year), income, expense, amount: expense };
-    });
+    const incomeByYear = new Map<number, number>();
+    const expenseByYear = new Map<number, number>();
+
+    for (const income of this.store().incomes || []) {
+      const year = Number((income.incomeDate || "").slice(0, 4));
+      if (!Number.isInteger(year) || year <= 0) continue;
+      incomeByYear.set(year, (incomeByYear.get(year) || 0) + (Number(income.amount) || 0));
+    }
+    for (const expense of this.store().expenses || []) {
+      const year = Number((expense.expenseDate || "").slice(0, 4));
+      if (!Number.isInteger(year) || year <= 0) continue;
+      expenseByYear.set(year, (expenseByYear.get(year) || 0) + (Number(expense.amount) || 0));
+    }
+
+    const years = new Set<number>([...incomeByYear.keys(), ...expenseByYear.keys()]);
+    if (years.size === 0) years.add(this.reportYear);
+
+    return [...years]
+      .sort((a, b) => a - b)
+      .map((year) => {
+        const income = incomeByYear.get(year) || 0;
+        const expense = expenseByYear.get(year) || 0;
+        return { label: String(year), income, expense, amount: expense };
+      });
   }
 
   /** Expense totals grouped by category for the selected reporting year.
@@ -553,10 +605,17 @@ export class BudgetService {
   }
 
   get categoriesSpend() {
+    const monthPrefix = this.month();
+    const totals = new Map<string, number>();
+    for (const expense of this.store().expenses || []) {
+      if (!expense.expenseDate?.startsWith(monthPrefix)) continue;
+      const category = expense.category || "";
+      totals.set(category, (totals.get(category) || 0) + (Number(expense.amount) || 0));
+    }
     return this.categories
       .map((category) => ({
         category,
-        amount: this.monthExpensesByCategory(category),
+        amount: totals.get(category) || 0,
       }))
       .filter((x) => x.amount > 0)
       .sort((a, b) => b.amount - a.amount);
