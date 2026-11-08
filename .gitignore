@@ -4,6 +4,7 @@ node_modules/
 # Angular build output
 dist/
 .angular/
+build-output.txt
 
 # Test coverage
 coverage/

@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from "@angular/core";
+import { Injectable, computed, signal, effect } from "@angular/core";
 import { Router } from "@angular/router";
 import { ApiService } from "./api.service";
 import { AuthService } from "./auth.service";
@@ -68,6 +68,12 @@ export class BudgetService {
   ) {
     this.store = this.storage.store;
     this.settings = this.storage.settings;
+    effect(() => {
+      if (!this.auth.user()) {
+        this.initialized = false;
+        this.connection.set("disconnected");
+      }
+    });
   }
 
   async init() {
@@ -1323,6 +1329,7 @@ async deleteTransaction(t: Transaction) {
   }
 
   logout() {
+    this.initialized = false;
     this.auth.logout();
     this.storage.reset();
     this.router.navigate(["/login"]);

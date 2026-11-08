@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from "@angular/core";
+import { Injectable, inject, signal, effect } from "@angular/core";
 import {
   emptyStore,
   Settings,
@@ -27,8 +27,20 @@ export class StorageService {
 
   private readonly settingsKey = "budget-tracker-settings-v1";
   private readonly auth = inject(AuthService);
+  private lastUserId: number | null | undefined = undefined;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) {
+    effect(() => {
+      const userId = this.auth.userId;
+      if (
+        this.lastUserId !== undefined &&
+        this.lastUserId !== userId
+      ) {
+        this.reset();
+      }
+      this.lastUserId = userId;
+    });
+  }
 
   private loadStore(): Store {
     return emptyStore();
@@ -70,6 +82,12 @@ export class StorageService {
 
   reset() {
     this.updateStore(emptyStore());
+    this.categoryRecords.set([]);
+    this.paymentModeRecords.set([]);
+    this.categoryOptions.set([]);
+    this.paymentModeOptions.set([]);
+    this.incomeSourceOptions.set([]);
+    this.api.clearCache();
   }
 
   async syncFromApi(): Promise<boolean> {
