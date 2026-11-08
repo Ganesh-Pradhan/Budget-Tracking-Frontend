@@ -7,4 +7,5 @@ export interface Account {
   accountNumber: string;
   balance: number;
   isActive: boolean;
+  rowVersion?: string;
 }

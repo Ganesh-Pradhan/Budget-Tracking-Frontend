@@ -1056,6 +1056,7 @@ export class BudgetService {
           accountNumber: (f.accountNumber ?? this.editing?.accountNumber ?? null) || null,
           balance: amount,
           isActive: this.editing?.isActive ?? true,
+          ...(this.editing?.rowVersion != null ? { rowVersion: this.editing.rowVersion } : {}),
         };
         if (this.editing)
           await this.api.put(
@@ -1265,7 +1266,17 @@ async deleteTransaction(t: Transaction) {
           : "recurringtransactions";
       if (!this.connectionIsAvailable())
         throw new Error("API is not connected.");
-      await this.api.delete(this.settings().apiBaseUrl, `/api/${path}/${id}`);
+
+      // Accounts require the concurrency token (rowVersion) for optimistic
+      // delete. Look up the account in the store and pass it as a query param.
+      let deletePath = `/api/${path}/${id}`;
+      if (type === "accounts") {
+        const acct = this.store().accounts.find((a: any) => a.accountId === id);
+        if (acct?.rowVersion != null) {
+          deletePath += `?rowVersion=${encodeURIComponent(acct.rowVersion)}`;
+        }
+      }
+      await this.api.delete(this.settings().apiBaseUrl, deletePath);
       try {
         await this.storage.syncFromApi();
         this.applyApiOptions();
